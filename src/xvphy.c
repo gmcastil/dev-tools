@@ -63,10 +63,16 @@ void xvphy_print_general(volatile uint32_t *regs)
 	xvphy_print_reg("ERROR IRQ", regs[XVPHY_ERR_IRQ / 4]);
 }
 
-void xvphy_print_version_info(uint32_t version)
+void xvphy_print_version_info(volatile uint32_t *regs)
 {
-	printf("--- VPHY core: version decoding ---\n");
+	uint32_t version;
 
+	printf("--- VPHY core: version decoding ---\n");
+	if (!regs) {
+		fprintf(stderr, "%s\n", "Error: Null register pointer");
+		return;
+	}
+	version = regs[XVPHY_VERSION_REG / 4];
 	uint32_t internal_rev = (version & XVPHY_VERSION_INTER_REV_MASK);
 	uint32_t core_patch = (version & XVPHY_VERSION_CORE_PATCH_MASK) 
 					>> XVPHY_VERSION_CORE_PATCH_SHIFT;

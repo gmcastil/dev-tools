@@ -8,7 +8,7 @@ void xvphy_print_reg(const char *label, uint32_t value);
 const char *xvphy_refclk_name(uint32_t sel);
 
 void xvphy_print_general(volatile uint32_t *regs);
-void xvphy_print_version_info(uint32_t version);
+void xvphy_print_version_info(volatile uint32_t *regs);
 void xvphy_print_drp(volatile uint32_t *regs);
 void xvphy_print_tx(volatile uint32_t *regs);
 void xvphy_print_rx(volatile uint32_t *regs);
