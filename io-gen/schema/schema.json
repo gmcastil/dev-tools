@@ -13,9 +13,11 @@
                 "properties": {
                     "name": { "type" : "string" },
                     "direction" : { "enum": ["in", "out", "inout"] },
-                    "buffer": { "type": "string" }
+                    "buffer": { "$ref": "defs/buffer.json" },
+                    "iostandard": { "$ref": "defs/iostandard.json" },
+                    "bank": { "type": "integer", "minimum": 0 }
                 },
-                "required": ["name", "direction", "buffer" ],
+                "required": ["name", "direction", "buffer", "bank"],
                 "oneOf": [
                     {
                         "required": ["pin"],
@@ -68,8 +70,24 @@
                     }
                 ]
             }
-        }
-    },
-    "required": ["title", "part", "signals"]
+        },
+        "banks": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "bank": { "type": "integer", "minimum": 0 },
+                    "comment": { "type": "string" },
+                    "iostandard": { "$ref": "defs/iostandard.json" },
+                    "performance": {
+                        "type": "string",
+                        "enum": ["HD", "HR", "HP"]
+                    }
+                },
+                "required": ["bank", "iostandard", "performance"]
+            }
+        },
+        "required": ["title", "part", "signals", "banks"]
+    }
 }
 

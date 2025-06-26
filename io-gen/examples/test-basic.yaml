@@ -2,17 +2,20 @@ title: Testing basic schema
 part: xc7020
 signals:
   - name: led_single
+    bank: 34
     direction: out
     buffer: obuf
     pin: P1
 
   - name: led_array
+    bank: 34
     direction: out
     buffer: obuf
     pins: [A1, B1, C1]
     width: 3
 
   - name: diff_pair
+    bank: 34
     direction: in
     buffer: ibufds
     pins:
@@ -20,6 +23,7 @@ signals:
       n: E1
 
   - name: diff_pair_bus
+    bank: 34
     direction: out
     buffer: obufds
     pins:
@@ -27,4 +31,9 @@ signals:
       n: [B10, B11, B12]
     width: 3
 
+banks:
+  - bank: 34
+    comment: ChipKIT IO bank
+    performance: HD
+    iostandard: LVCMOS33
 

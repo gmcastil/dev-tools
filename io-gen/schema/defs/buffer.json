@@ -1,0 +1,6 @@
+{
+    "type": "string",
+    "enum": [
+        "ibuf", "obuf", "ibufds", "obufds"
+    ]
+}

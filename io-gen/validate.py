@@ -1,19 +1,25 @@
 #!/usr/bin/python3
 
+import os
 import json
 import yaml
-from jsonschema import validate, ValidationError
+from jsonschema import Draft202012Validator, RefResolver
 
-with open("./schema/schema.json") as s:
-    schema = json.load(s)
+# Paths
+schema_dir = os.path.join(os.path.dirname(__file__), "schema")
+schema_path = os.path.join(schema_dir, "schema.json")
+yaml_path = os.path.join(os.path.dirname(__file__), "examples", "test-basic.yaml")
 
-with open("./examples/test-basic.yaml") as y:
-    data = yaml.safe_load(y)
+# Load schema and instance
+with open(schema_path) as f:
+    schema = json.load(f)
+with open(yaml_path) as f:
+    instance = yaml.safe_load(f)
 
-try:
-    validate(instance=data, schema=schema)
-    print("✅ YAML is valid")
-except ValidationError as e:
-    print("❌ YAML is invalid")
-    print(e.message)
+# Use base URI to resolve $ref correctly
+resolver = RefResolver(base_uri=f"file://{schema_dir}/", referrer=schema)
+
+# Validate
+Draft202012Validator(schema, resolver=resolver).validate(instance)
+print("✅ YAML is valid")
 
