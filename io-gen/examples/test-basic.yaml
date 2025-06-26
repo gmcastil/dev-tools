@@ -1,0 +1,30 @@
+title: Testing basic schema
+part: xc7020
+signals:
+  - name: led_single
+    direction: out
+    buffer: obuf
+    pin: P1
+
+  - name: led_array
+    direction: out
+    buffer: obuf
+    pins: [A1, B1, C1]
+    width: 3
+
+  - name: diff_pair
+    direction: in
+    buffer: ibufds
+    pins:
+      p: D1
+      n: E1
+
+  - name: diff_pair_bus
+    direction: out
+    buffer: obufds
+    pins:
+      p: [A10, A11, A12]
+      n: [B10, B11, B12]
+    width: 3
+
+

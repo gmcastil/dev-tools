@@ -1,0 +1,75 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "IO generator schema",
+    "description": "Schema for describing PL pins....TBD",
+    "type": "object",
+    "properties": {
+        "title": { "type" : "string"},
+        "part": { "type" : "string"},
+        "signals": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": { "type" : "string" },
+                    "direction" : { "enum": ["in", "out", "inout"] },
+                    "buffer": { "type": "string" }
+                },
+                "required": ["name", "direction", "buffer" ],
+                "oneOf": [
+                    {
+                        "required": ["pin"],
+                        "properties": {
+                            "pin": { "type": "string" }
+                        }
+                    },
+                    {
+                        "required": ["pins", "width"],
+                        "properties": {
+                            "pins": {
+                                "type": "array",
+                                "items": { "type": "string" }
+                            },
+                            "width": { "type": "integer", "minimum": 1 }
+                        }
+                    },
+                    {
+                        "required": ["pins"],
+                        "properties": {
+                            "pins": {
+                                "type": "object",
+                                "required": ["p", "n"],
+                                "properties": {
+                                    "p": { "type": "string" },
+                                    "n": { "type": "string" }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "required": ["pins", "width"],
+                        "properties": {
+                            "pins": {
+                                "type": "object",
+                                "required": ["p", "n"],
+                                "properties": {
+                                    "p": {
+                                        "type": "array",
+                                        "items": { "type": "string" }
+                                    },
+                                    "n": {
+                                        "type": "array",
+                                        "items": { "type": "string" }
+                                    }
+                                }
+                            },
+                            "width": { "type": "integer", "minimum": 1 }
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "required": ["title", "part", "signals"]
+}
+
