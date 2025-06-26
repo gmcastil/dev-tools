@@ -1,0 +1,4 @@
+.coverage
+.venv_installed_stamp
+.venv/
+
