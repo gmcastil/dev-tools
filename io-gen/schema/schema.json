@@ -15,36 +15,37 @@
                     "direction" : { "enum": ["in", "out", "inout"] },
                     "buffer": { "$ref": "defs/buffer.json" },
                     "iostandard": { "$ref": "defs/iostandard.json" },
+                    "group": { "$ref": "defs/group.json" },
                     "bank": { "type": "integer", "minimum": 0 }
                 },
                 "required": ["name", "direction", "buffer", "bank"],
                 "oneOf": [
                     {
-                        "required": ["pin"],
                         "properties": {
                             "pin": { "type": "string" }
-                        }
+                        },
+                        "required": ["pin"]
                     },
                     {
-                        "required": ["pins", "width"],
                         "properties": {
                             "pins": {
                                 "type": "array",
                                 "items": { "type": "string" }
                             },
                             "width": { "type": "integer", "minimum": 1 }
-                        }
+                        },
+                        "required": ["pins", "width"]
                     },
                     {
                         "required": ["pins"],
                         "properties": {
                             "pins": {
                                 "type": "object",
-                                "required": ["p", "n"],
                                 "properties": {
                                     "p": { "type": "string" },
                                     "n": { "type": "string" }
-                                }
+                                },
+                                "required": ["p", "n"]
                             }
                         }
                     },
@@ -53,7 +54,6 @@
                         "properties": {
                             "pins": {
                                 "type": "object",
-                                "required": ["p", "n"],
                                 "properties": {
                                     "p": {
                                         "type": "array",
@@ -63,7 +63,8 @@
                                         "type": "array",
                                         "items": { "type": "string" }
                                     }
-                                }
+                                },
+                                "required": ["p", "n"]
                             },
                             "width": { "type": "integer", "minimum": 1 }
                         }
@@ -86,8 +87,8 @@
                 },
                 "required": ["bank", "iostandard", "performance"]
             }
-        },
-        "required": ["title", "part", "signals", "banks"]
-    }
+        }
+    },
+    "required": ["title", "part", "signals", "banks"]
 }
 

@@ -1,0 +1,6 @@
+{
+    "type": "string",
+    "enum": [
+        "clock", "reset", "pmod", "led", "uart", "emio", "switch"
+    ]
+}
