@@ -5,6 +5,7 @@ SHELL			:= /bin/bash
 PRINTF			:= /bin/printf
 RM			:= /bin/rm
 TOUCH			:= /bin/touch
+FIND			:= /bin/find
 
 VENV 			:= .venv
 VENV_INSTALLED_STAMP	:= .venv_installed_stamp
@@ -32,7 +33,14 @@ check-venv: $(VENV_INSTALLED_STAMP)
 	@$(PRINTF) '%s\n' "Executable: $(PYTHON)"
 	@$(PRINTF) '%s' "Sys.path: "
 	@$(PYTHON) -c "import sys; from pprint import pprint; pprint(sys.path)"
-clean:
+
+clean-pyc:
+	$(FIND) . -type f -iname '*.py[co]' -delete
+	$(FIND) . -type d -iname '__pycache__' -delete
+	$(RM) -rf .pytest_cache
+
+clean: clean-pyc
 	$(RM) -rf $(VENV)
 	$(RM) -f $(VENV_INSTALLED_STAMP)
+	$(RM) -f .coverage
 
