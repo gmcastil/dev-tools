@@ -31,15 +31,13 @@
                             "pins": {
                                 "type": "array",
                                 "items": { "type": "string" }
-                            },
-                            "width": { "type": "integer", "minimum": 1 }
+                            }
                         },
-                        "required": ["pins", "width"]
+                        "required": ["pins"]
                     },
                     {
-                        "required": ["pins"],
                         "properties": {
-                            "pins": {
+                            "pinset": {
                                 "type": "object",
                                 "properties": {
                                     "p": { "type": "string" },
@@ -47,12 +45,12 @@
                                 },
                                 "required": ["p", "n"]
                             }
-                        }
+                        },
+                        "required": ["pinset"]
                     },
                     {
-                        "required": ["pins", "width"],
                         "properties": {
-                            "pins": {
+                            "pinset": {
                                 "type": "object",
                                 "properties": {
                                     "p": {
@@ -65,9 +63,9 @@
                                     }
                                 },
                                 "required": ["p", "n"]
-                            },
-                            "width": { "type": "integer", "minimum": 1 }
-                        }
+                            }
+                        },
+                        "required": ["pinset"]
                     }
                 ]
             }
