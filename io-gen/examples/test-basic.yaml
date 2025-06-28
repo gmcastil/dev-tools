@@ -12,7 +12,6 @@ signals:
     direction: out
     buffer: obuf
     pins: [A1, B1, C1]
-    width: 3
 
   - name: diff_pair
     bank: 34
@@ -29,7 +28,6 @@ signals:
     pinset:
       p: [A10, A11, A12]
       n: [B10, B11, B12]
-      width: 3
 
 banks:
   - bank: 34
