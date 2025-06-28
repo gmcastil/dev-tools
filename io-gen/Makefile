@@ -23,10 +23,10 @@ $(VENV_INSTALLED_STAMP): requirements.txt
 	$(TOUCH) $(VENV_INSTALLED_STAMP)
 
 test: $(VENV_INSTALLED_STAMP)
-	$(PYTEST)
+	@$(PYTHON) -m pytest
 
 coverage: $(VENV_INSTALLED_STAMP)
-	$(PYTEST) $(COVERAGE_ARGS)
+	@$(PYTHON) -m pytest $(COVERAGE_ARGS)
 
 check-venv: $(VENV_INSTALLED_STAMP)
 	@$(PYTHON) -m site

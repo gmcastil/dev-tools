@@ -1,45 +1,157 @@
 import pytest
+
 import yaml
-from io_gen import validator
-from jsonschema import ValidationError
 
-def test_valid_yaml_is_accepted():
-    # Sample minimal valid YAML structure
+from jsonschema.exceptions import ValidationError
+
+from io_gen.validator import validate
+
+def test_valid_pin_scalar():
     raw_yaml = """
-    title: arty-z7-20
-    part: xc7z020clg400-1
+    title: test
+    part: xc7z020
     banks:
       - bank: 34
         iostandard: LVCMOS33
+        performance: HP
     signals:
       - name: led
-        pad: K17
         direction: out
-        bank: 34
         buffer: obuf
+        bank: 34
+        pin: A1
     """
+    data = yaml.safe_load(raw_yaml)
+    validate(data)
 
-    parsed = yaml.safe_load(raw_yaml)
-    validated = validator.validate_yaml_dict(parsed)
-    assert isinstance(validated, dict)
-    assert validated["title"] == "arty-z7-20"
-
-def test_invalid_yaml_missing_field_raises():
+def test_valid_pins_vector():
     raw_yaml = """
-    title: arty-z7-20
-    part: xc7z020clg400-1
+    title: test
+    part: xc7z020
     banks:
       - bank: 34
         iostandard: LVCMOS33
+        performance: HP
+    signals:
+      - name: leds
+        direction: out
+        buffer: obuf
+        bank: 34
+        pins: [A1, A2, A3]
+    """
+    data = yaml.safe_load(raw_yaml)
+    validate(data)
+
+def test_valid_pinset_diff_scalar():
+    raw_yaml = """
+    title: test
+    part: xc7z020
+    banks:
+      - bank: 34
+        iostandard: LVCMOS33
+        performance: HP
+    signals:
+      - name: clk
+        direction: in
+        buffer: ibuf
+        bank: 34
+        pinset:
+          p: H1
+          n: H2
+    """
+    data = yaml.safe_load(raw_yaml)
+    validate(data)
+
+def test_valid_pinset_diff_vector():
+    raw_yaml = """
+    title: test
+    part: xc7z020
+    banks:
+      - bank: 34
+        iostandard: LVCMOS33
+        performance: HP
+    signals:
+      - name: data
+        direction: in
+        buffer: ibuf
+        bank: 34
+        pinset:
+          p: [H1, H2]
+          n: [H3, H4]
+    """
+    data = yaml.safe_load(raw_yaml)
+    validate(data)
+
+def test_missing_pin_and_pinset():
+    raw_yaml = """
+    title: test
+    part: xc7z020
+    banks:
+      - bank: 34
+        iostandard: LVCMOS33
+        performance: HP
     signals:
       - name: led
-        pad: K17
-        bank: 34
+        direction: out
         buffer: obuf
-    """  # ← missing `direction`
-
-    parsed = yaml.safe_load(raw_yaml)
-
+        bank: 34
+    """
     with pytest.raises(ValidationError):
-        validator.validate_yaml_dict(parsed)
+        validate(yaml.safe_load(raw_yaml))
 
+def test_conflicting_pin_and_pins():
+    raw_yaml = """
+    title: test
+    part: xc7z020
+    banks:
+      - bank: 34
+        iostandard: LVCMOS33
+        performance: HP
+    signals:
+      - name: conflict
+        direction: out
+        buffer: obuf
+        bank: 34
+        pin: A1
+        pins: [A1, A2]
+    """
+    with pytest.raises(ValidationError):
+        validate(yaml.safe_load(raw_yaml))
+
+def test_pinset_scalar_missing_n():
+    raw_yaml = """
+    title: test
+    part: xc7z020
+    banks:
+      - bank: 34
+        iostandard: LVCMOS33
+        performance: HP
+    signals:
+      - name: diff
+        direction: in
+        buffer: ibuf
+        bank: 34
+        pinset:
+          p: H1
+    """
+    with pytest.raises(ValidationError):
+        validate(yaml.safe_load(raw_yaml))
+
+def test_pinset_vector_mismatched_arrays():
+    raw_yaml = """
+    title: test
+    part: xc7z020
+    banks:
+      - bank: 34
+        iostandard: LVCMOS33
+        performance: HP
+    signals:
+      - name: diff_vec
+        direction: in
+        buffer: ibuf
+        bank: 34
+        pinset:
+          p: [H1, H2, H3]
+          n: [H4, H5]
+    """
+    validate(yaml.safe_load(raw_yaml))
