@@ -8,7 +8,7 @@ def test_flatten_with_all_pin_types_and_group():
         "title": "Test Project",
         "part": "xc7z020clg400-1",
         "banks": [
-            {"bank": 34, "iostandard": "LVCMOS33", "performance": "HR"},
+            {"bank": 34, "iostandard": "LVCMOS33", "performance": "HR", "comment": "testing"},
             {"bank": 35, "iostandard": "LVCMOS18", "performance": "HP"},
         ],
         "signals": [
@@ -50,9 +50,10 @@ def test_flatten_with_all_pin_types_and_group():
         ]
     }
 
-    flat = flatten_signals(data)
+    flat_banks = flatten_banks(data["banks"])
+    flat_signals = flatten_signals(data["signals"], flat_banks)
 
-    assert flat == [
+    assert flat_signals == [
         {
             "name": "led",
             "direction": "out",
@@ -117,9 +118,10 @@ def test_flatten_inherits_iostandard():
         ]
     }
 
-    flat = flatten_signals(data)
+    flat_banks = flatten_banks(data["banks"])
+    flat_signals = flatten_signals(data["signals"], flat_banks)
 
-    assert flat == [
+    assert flat_signals == [
         {
             "name": "led",
             "direction": "out",
@@ -153,9 +155,10 @@ def test_flatten_iostandard_override():
         ]
     }
 
-    flat = flatten_signals(data)
+    flat_banks = flatten_banks(data["banks"])
+    flat_signals = flatten_signals(data["signals"], flat_banks)
 
-    assert flat == [
+    assert flat_signals == [
         {
             "name": "clk",
             "direction": "in",
@@ -186,9 +189,9 @@ def test_flatten_banks_basic():
         "signals": []  # irrelevant for this test
     }
 
-    banks = flatten_banks(data)
+    flat_banks = flatten_banks(data["banks"])
 
-    assert banks == {
+    assert flat_banks == {
         34: {
             "iostandard": "LVCMOS33",
             "performance": "HR",
@@ -220,7 +223,7 @@ def test_flatten_banks_duplicate_raises():
     }
 
     with pytest.raises(ValueError, match="Found duplicate bank 34 entry"):
-        flatten_banks(data)
+        flatten_banks(data["banks"])
 
 def test_flatten_preserves_single_element_pinset_lists():
     data = {
@@ -241,11 +244,12 @@ def test_flatten_preserves_single_element_pinset_lists():
         ]
     }
 
-    flat = flatten_signals(data)
+    flat_banks = flatten_banks(data["banks"])
+    flat_signals = flatten_signals(data["signals"], flat_banks)
 
-    assert isinstance(flat[0]["pinset"]["p"], list)
-    assert flat[0]["pinset"]["p"] == ["A12"]
-    assert flat[0]["pinset"]["n"] == ["A11"]
+    assert isinstance(flat_signals[0]["pinset"]["p"], list)
+    assert flat_signals[0]["pinset"]["p"] == ["A12"]
+    assert flat_signals[0]["pinset"]["n"] == ["A11"]
 
 def test_flatten_preserves_width_1_pinset_bus():
     """
@@ -280,8 +284,10 @@ def test_flatten_preserves_width_1_pinset_bus():
         ]
     }
 
-    flat = flatten_signals(data)
-    signal = flat[0]
+    flat_banks = flatten_banks(data["banks"])
+    flat_signals = flatten_signals(data["signals"], flat_banks)
+
+    signal = flat_signals[0]
 
     assert signal["name"] == "diff_bus_1bit"
     assert isinstance(signal["pinset"]["p"], list)
@@ -317,10 +323,32 @@ def test_flatten_preserves_single_element_pins_bus():
         ]
     }
 
-    flat = flatten_signals(data)
-    signal = flat[0]
+    flat_banks = flatten_banks(data["banks"])
+    flat_signals = flatten_signals(data["signals"], flat_banks)
+    signal = flat_signals[0]
 
     assert signal["name"] == "bus_out"
     assert isinstance(signal["pins"], list)
     assert signal["pins"] == ["A1"]
 
+def test_flatten_signals_missing_bank_raises():
+    data = {
+        "banks": [
+            # no bank 99 defined here
+            {"bank": 34, "iostandard": "LVCMOS33", "performance": "HR"}
+        ],
+        "signals": [
+            {
+                "name": "debug",
+                "direction": "out",
+                "buffer": "obuf",
+                "bank": 99,  # not defined
+                "pin": "F3"  # no iostandard specified
+            }
+        ]
+    }
+
+    flat_banks = flatten_banks(data["banks"])
+
+    with pytest.raises(ValueError, match=r"Signal 'debug' refers to undefined bank 99"):
+        flatten_signals(data["signals"], flat_banks)
