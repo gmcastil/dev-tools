@@ -6,12 +6,15 @@ PRINTF			:= /bin/printf
 RM			:= /bin/rm
 TOUCH			:= /bin/touch
 FIND			:= /bin/find
+GREP			:= /bin/grep
 
 VENV 			:= .venv
 VENV_INSTALLED_STAMP	:= .venv_installed_stamp
 PYTHON 			:= $(VENV)/bin/python3
 PIP			:= $(VENV)/bin/pip
 PYTEST			:= $(VENV)/bin/pytest
+
+PROJ_FILES		:= $(shell git ls-files)
 
 COVERAGE_ARGS		:= --cov=$(PKG_NAME) --cov-report=term-missing
 
@@ -38,6 +41,10 @@ clean-pyc:
 	$(FIND) . -type f -iname '*.py[co]' -delete
 	$(FIND) . -type d -iname '__pycache__' -delete
 	$(RM) -rf .pytest_cache
+
+check-ascii:
+	@$(PRINTF) '%s\n' "Checking for non-ASCII characters..."
+	@LC_ALL=C $(GREP) --color='always' -Pn "[^\x00-\x7F]" $(PROJ_FILES) || $(PRINTF) 'OK\n'
 
 clean: clean-pyc
 	$(RM) -rf $(VENV)

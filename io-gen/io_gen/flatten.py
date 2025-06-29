@@ -14,3 +14,23 @@ Output:
 
 """
 
+
+
+
+def flatten_signals(data: dict) -> list[dict]:
+    """
+    Flatten the list of signals, resolving inheritance from bank definitions.
+
+    Each returned signal dict includes all explicitly provided keys, plus inherited 'iostandard' if not overridden.
+
+    Args:
+        data (dict): Validated input data matching the schema.
+
+    Returns:
+        List[dict]: Flat list of resolved signal dictionaries.
+
+    """
+    pass
+
+def flatten_banks(data: dict) -> list[dict]:
+    pass
