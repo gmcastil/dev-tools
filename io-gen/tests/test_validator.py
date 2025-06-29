@@ -155,3 +155,41 @@ def test_pinset_vector_mismatched_arrays():
           n: [H4, H5]
     """
     validate(yaml.safe_load(raw_yaml))
+
+def test_signal_missing_required_field():
+    raw_yaml = """
+    title: test
+    part: xc7z020
+    banks:
+      - bank: 34
+        iostandard: LVCMOS33
+        performance: HP
+    signals:
+      - name: led
+        direction: out
+        # buffer is missing here
+        bank: 34
+        pin: A1
+    """
+    with pytest.raises(ValidationError, match=".*buffer.*"):
+        validate(yaml.safe_load(raw_yaml))
+
+def test_signal_unsupported_buffer():
+    raw_yaml = """
+    title: test
+    part: xc7z020
+    banks:
+      - bank: 34
+        iostandard: LVCMOS33
+        performance: HP
+    signals:
+      - name: led
+        direction: out
+        # this is not supported yet
+        buffer: odelay
+        bank: 34
+        pin: A1
+    """
+    with pytest.raises(ValidationError, match=".*buffer.*"):
+        validate(yaml.safe_load(raw_yaml))
+
