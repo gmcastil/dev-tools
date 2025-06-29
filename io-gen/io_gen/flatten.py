@@ -1,27 +1,4 @@
-def normalize(data: dict) -> dict:
-    """
-    Normalize the top-level YAML structure by flattening signals and banks.
-
-    This function:
-    - Replaces 'banks' with a lookup dictionary (bank number -> bank attributes)
-    - Replaces 'signals' with a list of fully resolved signal entries
-    - Preserves all other top-level fields (e.g. title, part, metadata)
-
-    Args:
-        data (dict): Validated YAML input matching the schema.
-
-    Returns:
-        dict: A normalized copy of the input data, with 'signals' and 'banks' flattened.
-
-    """
-    normalized = dict(data)  # Shallow copy preserves any other remaining keys
-
-    # Banks need to be flattened first so that signals can properly inherit items
-    normalized["banks"] = flatten_banks(data["banks"])
-    # Now flatten signals
-    normalized["signals"] = flatten_signals(data["signals"], normalized["banks"])
-
-    return normalized
+from copy import deepcopy
 
 def flatten_signals(signals: list[dict], banks: dict[int, dict]) -> list[dict]:
     """
@@ -43,15 +20,16 @@ def flatten_signals(signals: list[dict], banks: dict[int, dict]) -> list[dict]:
     """
     result = []
     for signal in signals:
+        signal_copy = deepcopy(signal)  # Copy because we're going to mutate the signal dict
 
         # The IOSTANDARD property is not required and can be inherited from the bank if not provided
-        if "iostandard" not in signal:
-            number = signal["bank"]
+        if "iostandard" not in signal_copy:
+            number = signal_copy["bank"]
             if number in banks:
-                signal["iostandard"] = banks[number]["iostandard"]
+                signal_copy["iostandard"] = banks[number]["iostandard"]
             else:
-                raise ValueError(f"Signal '{signal['name']}' refers to undefined bank {number}")
-        result.append(signal)
+                raise ValueError(f"Signal '{signal_copy['name']}' refers to undefined bank {number}")
+        result.append(signal_copy)
     return result
 
 def flatten_banks(banks: list[dict]) -> dict[int, dict]:
@@ -78,7 +56,8 @@ def flatten_banks(banks: list[dict]) -> dict[int, dict]:
     result = {}
 
     for bank in banks:
-        number = bank["bank"]
+        bank_copy = deepcopy(bank)  # Copy because we're going to mutate the bank dict
+        number = bank_copy["bank"]
         # Recall that the keys in the result dict are the bank numbers,
         # so we check for duplicates
         if number in result:
@@ -86,8 +65,8 @@ def flatten_banks(banks: list[dict]) -> dict[int, dict]:
 
         # Flattened bank structure is just going to have the bank number
         # removed and used as the key in the result
-        del bank["bank"]
-        result[number] = bank
+        del bank_copy["bank"]
+        result[number] = bank_copy
 
     return result
 

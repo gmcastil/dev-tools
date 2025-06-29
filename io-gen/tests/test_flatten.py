@@ -352,3 +352,28 @@ def test_flatten_signals_missing_bank_raises():
 
     with pytest.raises(ValueError, match=r"Signal 'debug' refers to undefined bank 99"):
         flatten_signals(data["signals"], flat_banks)
+
+def test_flatten_signals_does_not_mutate_input():
+    original_signals = [{
+        "name": "data",
+        "direction": "in",
+        "buffer": "ibuf",
+        "bank": 34,
+        "pinset": {
+            "p": ["A1", "A2"],
+            "n": ["B1", "B2"]
+        }
+    }]
+    banks = {
+        34: {"iostandard": "LVCMOS33", "performance": "HP"}
+    }
+
+    import copy
+    signals_copy = copy.deepcopy(original_signals)
+    result = flatten_signals(signals_copy, banks)
+
+    assert signals_copy == original_signals
+    assert "iostandard" not in signals_copy[0]
+
+    assert result[0]["iostandard"] == "LVCMOS33"
+
