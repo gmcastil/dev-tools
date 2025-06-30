@@ -17,7 +17,6 @@ YAML descriptions.
 Data is transformed from YAML to an internal data model, with various structural and semantic checks along the way, in several stages.
 
 ### 1. **Validation (`validate`)**
-
 * **Input**: Raw user-provided YAML.
 * **Purpose**: Ensure the structure conforms to the JSON schema.
 * **Enforces**:
@@ -25,71 +24,62 @@ Data is transformed from YAML to an internal data model, with various structural
     * Type correctness (e.g., `pins` must be an array)
     * Disallow unknown fields (`additionalProperties: false`)
     * Mutual exclusivity (`pin` vs `pins`, etc.)
-    * **Output**: Structurally valid dictionary (parsed YAML).
+* **Output**: Structurally valid dictionary (parsed YAML).
 
     ---
 
 ### 2. **Normalization (`normalize`)**
 
-    * **Input**: Validated data from `validate()`
-    * **Purpose**: Flatten bank and signal definitions, apply inheritance.
-    * **Performs**:
+* **Input**: Validated data from `validate()`
+* **Purpose**: Flatten bank and signal definitions, apply inheritance.
+* **Performs**:
     * Convert list of banks → dict keyed by bank number
     * Apply inherited fields from banks to signals (e.g., `iostandard`)
     * Preserve optional fields like `group`, `bus`
-    * **Does NOT**:
-
-* Infer derived fields (e.g., width)
+* **Does NOT**:
+    * Infer derived fields (e.g., width) - done later in the annotation step
     * Modify structure for codegen
-    * **Output**: Clean, enriched signal list with resolved fields.
+* **Output**: Clean, enriched signal list with resolved fields.
 
     ---
 
 ### 3. **Annotation (`annotate`)**
 
-    * **Input**: Normalized dataset
-    * **Purpose**: Add derived fields, mainly `width`, and validate form.
-    * **Performs**:
-
+* **Input**: Normalized dataset from `normalize()`
+* **Purpose**: Add derived fields, mainly `width`, and validate form.
+* **Performs**:
     * Use `annotate_width()` to infer bit width from `pin`/`pins`/`pinset`
-* Validate shape consistency (e.g., matching array lengths in pinsets)
+    * Validate shape consistency (e.g., matching array lengths in pinsets) - the
+      schema cannot easily require that `p` and `n` have the same length for a
+      given pinset, so that part of validation is done here.
     * Honor `bus: true` to resolve ambiguity in width-1 cases
-    * **Output**: Annotated dataset with `width` and other derived values
+* **Output**: Annotated dataset with `width` and other derived values
 
     ---
 
 ### 4. **Semantic Check (`check`)**
 
-    * **Input**: Annotated dataset
-    * **Purpose**: Enforce semantic rules required for safe codegen.
-    * **Checks**:
-
+* **Input**: Annotated dataset from `annotate()`
+* **Purpose**: Enforce semantic rules required to clearly generate HDL and XDC code
+* **Checks**:
     * Duplicate signal names
     * Pin reuse across signals or vector overlaps
-* Pinset consistency (already checked in annotate)
-    * TODO: incompatible direction/buffer combos, conflicting assignments, bank cross-checks
-    * **Output**: Raises `ValueError` on invalid designs, returns None if OK
+    * Pinset consistency (already checked in annotate)
+    * TODO: Any part specific checks (e.g., bank 34 is a HR bank on a xc7a35t)
+* **Output**: Raises `ValueError` on invalid designs, returns None if OK
 
     ---
 
 ### 5. **Codegen (`emit_hdl`, `emit_xdc`)** *(Future)*
 
-    * **Input**: Checked dataset
-    * **Purpose**: Generate synthesizable HDL and constraint files
-    * **Uses**:
-
-    * `name`, `width`, `direction`, `buffer` for HDL port declarations
-    * `pin`, `pins`, `pinset`, `bank`, `iostandard` for XDC
-    * **Output**: Text files written to disk or returned as strings
-
     ---
 
 ## Core Design Principles
 
-    * **Stage purity**: each stage should not mutate its input.
-    * **Validation upfront**: YAML is schema-checked before any logic runs.
-    * **Annotation is additive**: derive, don’t override.
-    * **Check is the final gate**: only passing datasets are eligible for codegen.
+* **Stage purity**: Each stage should not mutate its input (tests specifically written to verify this behavior
+* **Validation upfront**: YAML is schema-checked before any logic runs.
+* **Annotation is additive**: Derive, don’t override.
+* **Check is the final gate**: Only passing datasets are eligible for codegen.
 
     ---
 
@@ -104,5 +94,4 @@ Data is transformed from YAML to an internal data model, with various structural
 
     ---
 
-    This document serves as the foundation for understanding and extending `io-gen`. All stages should remain independently testable and comprehensible through this lens.
 
