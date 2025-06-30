@@ -5,16 +5,14 @@ expectations, and outputs. It defines the structure of the tool so future
 development can proceed without needing to mentally contain the entire
 implementation.
 
-     ---
-
 ## Goal
 Generate HDL and XDC constraints for top-level FPGA signals from structured
 YAML descriptions.
 
-     ---
-
 ## Pipeline Stages
 Data is transformed from YAML to an internal data model, with various structural and semantic checks along the way, in several stages.
+
+---
 
 ### 1. **Validation (`validate`)**
 * **Input**: Raw user-provided YAML.
@@ -26,7 +24,7 @@ Data is transformed from YAML to an internal data model, with various structural
     * Mutual exclusivity (`pin` vs `pins`, etc.)
 * **Output**: Structurally valid dictionary (parsed YAML).
 
-    ---
+---
 
 ### 2. **Normalization (`normalize`)**
 
@@ -41,7 +39,7 @@ Data is transformed from YAML to an internal data model, with various structural
     * Modify structure for codegen
 * **Output**: Clean, enriched signal list with resolved fields.
 
-    ---
+---
 
 ### 3. **Annotation (`annotate`)**
 
@@ -68,11 +66,12 @@ Data is transformed from YAML to an internal data model, with various structural
     * TODO: Any part specific checks (e.g., bank 34 is a HR bank on a xc7a35t)
 * **Output**: Raises `ValueError` on invalid designs, returns None if OK
 
-    ---
+---
 
 ### 5. **Codegen (`emit_hdl`, `emit_xdc`)** *(Future)*
 
-    ---
+TBD
+---
 
 ## Core Design Principles
 
@@ -81,7 +80,7 @@ Data is transformed from YAML to an internal data model, with various structural
 * **Annotation is additive**: Derive, don’t override.
 * **Check is the final gate**: Only passing datasets are eligible for codegen.
 
-    ---
+---
 
 ## Contracts Between Stages
 
