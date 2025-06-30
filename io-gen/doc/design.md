@@ -18,10 +18,9 @@ Data is transformed from YAML to an internal data model, with various structural
 
 ### 1. **Validation (`validate`)**
 
-     * **Input**: Raw user-provided YAML.
-     * **Purpose**: Ensure the structure conforms to the JSON schema.
-     * **Enforces**:
-
+* **Input**: Raw user-provided YAML.
+* **Purpose**: Ensure the structure conforms to the JSON schema.
+* **Enforces**:
     * Required fields (`name`, `direction`, etc.)
     * Type correctness (e.g., `pins` must be an array)
     * Disallow unknown fields (`additionalProperties: false`)
