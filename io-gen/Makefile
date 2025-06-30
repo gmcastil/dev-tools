@@ -2,11 +2,11 @@
 
 SHELL			:= /bin/bash
 
-PRINTF			:= /bin/printf
-RM			:= /bin/rm
-TOUCH			:= /bin/touch
-FIND			:= /bin/find
-GREP			:= /bin/grep
+PRINTF			:= printf
+RM			:= rm
+TOUCH			:= touch
+FIND			:= find
+GREP			:= grep
 
 VENV 			:= .venv
 VENV_INSTALLED_STAMP	:= .venv_installed_stamp
