@@ -1,3 +1,7 @@
+"""
+Tests for schema-level validation (presence of required fields, disallowed extras, etc).
+
+"""
 import pytest
 
 import yaml
@@ -264,7 +268,7 @@ def test_additional_properties_not_allowed():
         pin: A1
         foo: bar
     """
-    with pytest.raises(ValidationError, match="additional properties"):
+    with pytest.raises(ValidationError, match=r"(?i)additional properties"):
         validate(yaml.safe_load(raw_yaml))
 
 def test_pins_too_short_rejected():

@@ -1,4 +1,6 @@
-""" Validate input data before processing """
+"""
+Validate input data before processing
+"""
 import json
 from pathlib import Path
 

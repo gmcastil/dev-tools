@@ -21,7 +21,7 @@
                     "pins": {
                         "type": "array",
                         "items": { "type": "string" },
-                        "minitems": 2
+                        "minItems": 2
                     },
                     "pinset": {
                         "type": "object",
@@ -34,6 +34,7 @@
                     },
                     "bus": { "type": "boolean" }
                 },
+	            "additionalProperties": false,
                 "required": ["name", "direction", "buffer", "bank"],
                 "oneOf": [
                     { "required": ["pin"] },

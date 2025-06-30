@@ -1,7 +1,68 @@
+"""
+Tests signal and bank flattening prior to annotation
+
+"""
+
 import pytest
 
 from io_gen.flatten import flatten_signals
 from io_gen.flatten import flatten_banks
+
+def test_flatten_banks_basic():
+    data = {
+        "title": "Test",
+        "part": "xc7z020clg400-1",
+        "banks": [
+            {
+                "bank": 34,
+                "iostandard": "LVCMOS33",
+                "performance": "HR",
+                "comment": "used for LEDs"
+            },
+            {
+                "bank": 35,
+                "iostandard": "LVCMOS18",
+                "performance": "HP"
+            }
+        ],
+        "signals": []  # irrelevant for this test
+    }
+
+    flat_banks = flatten_banks(data["banks"])
+
+    assert flat_banks == {
+        34: {
+            "iostandard": "LVCMOS33",
+            "performance": "HR",
+            "comment": "used for LEDs"
+        },
+        35: {
+            "iostandard": "LVCMOS18",
+            "performance": "HP"
+        }
+    }
+
+def test_flatten_banks_duplicate_raises():
+    data = {
+        "title": "Test",
+        "part": "xc7z020clg400-1",
+        "banks": [
+            {
+                "bank": 34,
+                "iostandard": "LVCMOS33",
+                "performance": "HR"
+            },
+            {
+                "bank": 34,  # duplicate!
+                "iostandard": "LVCMOS18",
+                "performance": "HP"
+            }
+        ],
+        "signals": []
+    }
+
+    with pytest.raises(ValueError, match="Found duplicate bank 34 entry"):
+        flatten_banks(data["banks"])
 
 def test_flatten_with_all_pin_types_and_group():
     data = {
@@ -168,62 +229,6 @@ def test_flatten_iostandard_override():
             "iostandard": "LVDS_25"  # override wins
         }
     ]
-
-def test_flatten_banks_basic():
-    data = {
-        "title": "Test",
-        "part": "xc7z020clg400-1",
-        "banks": [
-            {
-                "bank": 34,
-                "iostandard": "LVCMOS33",
-                "performance": "HR",
-                "comment": "used for LEDs"
-            },
-            {
-                "bank": 35,
-                "iostandard": "LVCMOS18",
-                "performance": "HP"
-            }
-        ],
-        "signals": []  # irrelevant for this test
-    }
-
-    flat_banks = flatten_banks(data["banks"])
-
-    assert flat_banks == {
-        34: {
-            "iostandard": "LVCMOS33",
-            "performance": "HR",
-            "comment": "used for LEDs"
-        },
-        35: {
-            "iostandard": "LVCMOS18",
-            "performance": "HP"
-        }
-    }
-
-def test_flatten_banks_duplicate_raises():
-    data = {
-        "title": "Test",
-        "part": "xc7z020clg400-1",
-        "banks": [
-            {
-                "bank": 34,
-                "iostandard": "LVCMOS33",
-                "performance": "HR"
-            },
-            {
-                "bank": 34,  # duplicate!
-                "iostandard": "LVCMOS18",
-                "performance": "HP"
-            }
-        ],
-        "signals": []
-    }
-
-    with pytest.raises(ValueError, match="Found duplicate bank 34 entry"):
-        flatten_banks(data["banks"])
 
 def test_flatten_preserves_single_element_pinset_lists():
     data = {

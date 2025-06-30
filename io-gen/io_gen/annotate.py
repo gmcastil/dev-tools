@@ -1,8 +1,10 @@
 # io_gen/annotate.py
 
+from copy import deepcopy
+
 def annotate(data: dict) -> dict:
     """Add computed fields like width to normalized signals."""
-    annotated = dict(data)
+    annotated = deepcopy(data)
     annotated["signals"] = [annotate_width(sig) for sig in data["signals"]]
     return annotated
 

@@ -30,6 +30,9 @@ $(VENV_INSTALLED_STAMP): requirements.txt
 test: $(VENV_INSTALLED_STAMP)
 	@$(PYTHON) -m pytest -k $(TESTS)
 
+debug: $(VENV_INSTALLED_STAMP)
+	$(PYTHON) -m pytest -k $(TESTS) -s --pdb
+
 coverage: $(VENV_INSTALLED_STAMP)
 	@$(PYTHON) -m pytest $(COVERAGE_ARGS)
 
