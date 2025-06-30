@@ -193,3 +193,95 @@ def test_signal_unsupported_buffer():
     with pytest.raises(ValidationError, match=".*buffer.*"):
         validate(yaml.safe_load(raw_yaml))
 
+def test_bus_field_valid_boolean():
+    raw_yaml = """
+    title: test
+    part: xc7z020
+    banks:
+      - bank: 34
+        iostandard: LVCMOS33
+        performance: HP
+    signals:
+      - name: valid_bus
+        direction: out
+        buffer: obuf
+        bank: 34
+        pin: A1
+        bus: true
+    """
+    validate(yaml.safe_load(raw_yaml))
+
+def test_pin_with_bus_true_is_valid():
+    raw = """
+    title: test
+    part: xc7z020
+    banks:
+      - bank: 34
+        iostandard: LVCMOS33
+        performance: HP
+    signals:
+      - name: test_sig
+        direction: in
+        buffer: ibuf
+        bank: 34
+        pin: A1
+        bus: true
+    """
+    validate(yaml.safe_load(raw))
+
+def test_bus_field_invalid_type():
+    raw_yaml = """
+    title: test
+    part: xc7z020
+    banks:
+      - bank: 34
+        iostandard: LVCMOS33
+        performance: HP
+    signals:
+      - name: invalid_bus
+        direction: out
+        buffer: obuf
+        bank: 34
+        pin: A1
+        bus: "yes"
+    """
+    with pytest.raises(ValidationError, match="bus"):
+        validate(yaml.safe_load(raw_yaml))
+
+def test_additional_properties_not_allowed():
+    raw_yaml = """
+    title: test
+    part: xc7z020
+    banks:
+      - bank: 34
+        iostandard: LVCMOS33
+        performance: HP
+    signals:
+      - name: extra
+        direction: out
+        buffer: obuf
+        bank: 34
+        pin: A1
+        foo: bar
+    """
+    with pytest.raises(ValidationError, match="additional properties"):
+        validate(yaml.safe_load(raw_yaml))
+
+def test_pins_too_short_rejected():
+    raw_yaml = """
+    title: test
+    part: xc7z020
+    banks:
+      - bank: 34
+        iostandard: LVCMOS33
+        performance: HP
+    signals:
+      - name: short_bus
+        direction: out
+        buffer: obuf
+        bank: 34
+        pins: [A1]
+    """
+    with pytest.raises(ValidationError):
+        validate(yaml.safe_load(raw_yaml))
+

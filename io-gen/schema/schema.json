@@ -16,57 +16,29 @@
                     "buffer": { "$ref": "defs/buffer.json" },
                     "iostandard": { "$ref": "defs/iostandard.json" },
                     "group": { "$ref": "defs/group.json" },
-                    "bank": { "type": "integer", "minimum": 0 }
+                    "bank": { "type": "integer", "minimum": 0 },
+                    "pin": { "type": "string" },
+                    "pins": {
+                        "type": "array",
+                        "items": { "type": "string" },
+                        "minitems": 2
+                    },
+                    "pinset": {
+                        "type": "object",
+                        "properties": {
+                            "p": { "type": ["string", "array"], "items": { "type": "string" } },
+                            "n": { "type": ["string", "array"], "items": { "type": "string" } }
+                        },
+                        "required": ["p", "n"],
+                        "additionalProperties": false
+                    },
+                    "bus": { "type": "boolean" }
                 },
                 "required": ["name", "direction", "buffer", "bank"],
                 "oneOf": [
-                    {
-                        "properties": {
-                            "pin": { "type": "string" }
-                        },
-                        "required": ["pin"]
-                    },
-                    {
-                        "properties": {
-                            "pins": {
-                                "type": "array",
-                                "items": { "type": "string" }
-                            }
-                        },
-                        "required": ["pins"]
-                    },
-                    {
-                        "properties": {
-                            "pinset": {
-                                "type": "object",
-                                "properties": {
-                                    "p": { "type": "string" },
-                                    "n": { "type": "string" }
-                                },
-                                "required": ["p", "n"]
-                            }
-                        },
-                        "required": ["pinset"]
-                    },
-                    {
-                        "properties": {
-                            "pinset": {
-                                "type": "object",
-                                "properties": {
-                                    "p": {
-                                        "type": "array",
-                                        "items": { "type": "string" }
-                                    },
-                                    "n": {
-                                        "type": "array",
-                                        "items": { "type": "string" }
-                                    }
-                                },
-                                "required": ["p", "n"]
-                            }
-                        },
-                        "required": ["pinset"]
-                    }
+                    { "required": ["pin"] },
+                    { "required": ["pins"] },
+                    { "required": ["pinset"] }
                 ]
             }
         },
@@ -84,7 +56,8 @@
                     }
                 },
                 "required": ["bank", "iostandard", "performance"]
-            }
+            },
+            "additionalProperties": false
         }
     },
     "required": ["title", "part", "signals", "banks"]

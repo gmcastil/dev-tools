@@ -16,6 +16,8 @@ PYTEST			:= $(VENV)/bin/pytest
 
 PROJ_FILES		:= $(shell git ls-files)
 
+# Keywords to filter tests on (defaults to everything)
+TESTS			?= ""
 COVERAGE_ARGS		:= --cov=$(PKG_NAME) --cov-report=term-missing
 
 $(VENV_INSTALLED_STAMP): requirements.txt
@@ -26,7 +28,7 @@ $(VENV_INSTALLED_STAMP): requirements.txt
 	$(TOUCH) $(VENV_INSTALLED_STAMP)
 
 test: $(VENV_INSTALLED_STAMP)
-	@$(PYTHON) -m pytest
+	@$(PYTHON) -m pytest -k $(TESTS)
 
 coverage: $(VENV_INSTALLED_STAMP)
 	@$(PYTHON) -m pytest $(COVERAGE_ARGS)
