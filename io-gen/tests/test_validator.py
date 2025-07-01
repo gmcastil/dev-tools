@@ -158,6 +158,8 @@ def test_pinset_vector_mismatched_arrays():
           p: [H1, H2, H3]
           n: [H4, H5]
     """
+    # This is valid per the schema, even though the lenghts do not match. The
+    # annotation step will catch this later
     validate(yaml.safe_load(raw_yaml))
 
 def test_signal_missing_required_field():
@@ -271,6 +273,24 @@ def test_additional_properties_not_allowed():
     with pytest.raises(ValidationError, match=r"(?i)additional properties"):
         validate(yaml.safe_load(raw_yaml))
 
+def test_pin_not_a_bus():
+    raw_yaml = """
+    title: test
+    part: xc7z020
+    banks:
+      - bank: 34
+        iostandard: LVCMOS33
+        performance: HP
+    signals:
+      - name: short_bus
+        direction: out
+        buffer: obuf
+        bank: 34
+        pin: [A1]
+    """
+    with pytest.raises(ValidationError):
+        validate(yaml.safe_load(raw_yaml))
+
 def test_pins_too_short_rejected():
     raw_yaml = """
     title: test
@@ -287,5 +307,25 @@ def test_pins_too_short_rejected():
         pins: [A1]
     """
     with pytest.raises(ValidationError):
+        validate(yaml.safe_load(raw_yaml))
+
+def test_pinset_vector_too_short_rejected():
+    raw_yaml = """
+    title: test
+    part: xc7z020
+    banks:
+      - bank: 35
+        iostandard: LVCMOS33
+        performance: HR
+    signals:
+      - name: diff1bit
+        direction: in
+        buffer: ibufds
+        bank: 35
+        pinset:
+          p: [A1]
+          n: [B1]
+    """
+    with pytest.raises(ValidationError, match=".*minItems.*"):
         validate(yaml.safe_load(raw_yaml))
 

@@ -25,22 +25,42 @@
                     },
                     "pinset": {
                         "type": "object",
-                        "properties": {
-                            "p": { "type": ["string", "array"], "items": { "type": "string" } },
-                            "n": { "type": ["string", "array"], "items": { "type": "string" } }
-                        },
-                        "required": ["p", "n"],
-                        "additionalProperties": false
+                        "oneOf": [
+                            {
+                                "properties": {
+                                    "p": { "type": "string" },
+                                    "n": { "type": "string" }
+                                },
+                                "required": ["p", "n"],
+                                "additionalProperties": false
+                            },
+                            {
+                                "properties": {
+                                    "p": {
+                                        "type": "array",
+                                        "items": { "type": "string" },
+                                        "minItems": 2
+                                    },
+                                    "n": {
+                                        "type": "array",
+                                        "items": { "type": "string" },
+                                        "minItems": 2
+                                    }
+                                },
+                                "required": ["p", "n"],
+                                "additionalProperties": false
+                            }
+                        ]
                     },
                     "bus": { "type": "boolean" }
                 },
-	            "additionalProperties": false,
                 "required": ["name", "direction", "buffer", "bank"],
                 "oneOf": [
                     { "required": ["pin"] },
                     { "required": ["pins"] },
                     { "required": ["pinset"] }
-                ]
+                ],
+                "additionalProperties": false
             }
         },
         "banks": {
