@@ -1,5 +1,7 @@
 """
-Unit tests for annotate_width(): computes and validates signal width from pin/pins/pinset.
+Unit tests for annotate_width(), which computes signal width based only on
+structural pin, pins, or pinset fields. This function does not consider
+the 'bus' flag or validate semantic intent.
 
 """
 import pytest
@@ -33,19 +35,14 @@ def test_annotate_pinset_vector():
     result = annotate_width(signal.copy())
     assert result['width'] == 2
 
-def test_annotate_pinset_vector_length_1_requires_bus():
-    signal = {'pinset': {'p': ['A1'], 'n': ['B1']}}
-    with pytest.raises(ValueError, match='requires.*bus'):
-        annotate_width(signal.copy())
-
 def test_annotate_pinset_mismatched_types_raises():
-    signal = {'pinset': {'p': ['A1'], 'n': 'B1'}}
-    with pytest.raises(ValueError, match='must match type'):
+    signal = {'name': 'mismatched_types', 'pinset': {'p': ['A1'], 'n': 'B1'}}
+    with pytest.raises(ValueError, match='mismatched pinset types'):
         annotate_width(signal.copy())
 
 def test_annotate_pinset_mismatched_width_raises():
-    signal = {'pinset': {'p': ['A1', 'A2'], 'n': ['B1']}}
-    with pytest.raises(ValueError, match='must be equal length'):
+    signal = {'name': 'mismatched_widths', 'pinset': {'p': ['A1', 'A2'], 'n': ['B1']}}
+    with pytest.raises(ValueError, match='must be equal lengths'):
         annotate_width(signal.copy())
 
 def test_annotate_does_not_mutate_input():
