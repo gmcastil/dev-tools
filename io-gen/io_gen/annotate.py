@@ -42,10 +42,12 @@ def annotate_width(signal: dict) -> dict:
         # Unambiguously a vector
         signal_a["width"] = len(signal_a["pins"])
     elif "pinset" in signal_a:
+        # Schema cannot validate that p and n are both strings or lists,
+        # so we check the types and raise here and set the width depending
+        # on whether we have arrays or strings.
         pinset = signal_a['pinset']
         n = pinset['n']
         p = pinset['p']
-
         if type(n) != type(p):
             raise ValueError(
                 f"Signal '{signal_a['name']}' has mismatched pinset types: "
@@ -53,22 +55,26 @@ def annotate_width(signal: dict) -> dict:
                 "Both must be either strings or lists of equal length."
             )
 
+        # Lengths of n and p lists need to match
         if isinstance(p, list):
-            if len(p) != len(n):
+            p_len = len(pinset['p'])
+            n_len = len(pinset['n'])
+            if p_len != n_len:
                 raise ValueError(
                         f"Signal '{signal_a['name']}' must be equal lengths. "
                         f"'p' has length {len(p)}, 'n' has length {len(n)}."
                         )
             else:
                 signal_a["width"] = len(p)
+        # Strings can only have a width of 1
         elif isinstance(p, str):
-            signal_a["width"] = len(p)
-        # This would violate the schema requirements
+            signal_a["width"] = 1
+        # This should violate the schema requirements
         else:
             raise ValueError(
                     f"Signal '{signal_a['name']}' has an unknown type"
                     )
-    # This would violate the schema requirements
+    # This would violate the schema requirements too
     else:
         raise ValueError(
                 f"Signal '{signal_a['name']}' has missing pin definitions"

@@ -1,161 +1,84 @@
+"""
+Unit tests for semantic validation (check phase).
+Each test corresponds to a check_*() function in io_gen.check.
+
+"""
+
 import pytest
+from io_gen.check import (
+    check_duplicate_names,
+    check_duplicate_pins,
+    check_bus_misuse
+)
 
-from io_gen.check import check
+# --- Duplicate name checks
+def test_duplicate_names_raises():
+    signals = [
+        {"name": "clk", "pin": "A1"},
+        {"name": "clk", "pin": "A2"},
+    ]
+    with pytest.raises(ValueError, match=r"(?i)duplicate signal name"):
+        check_duplicate_names(signals)
 
-def test_duplicate_signal_names_raises():
-    normalized = {
-        "title": "Dup Test",
-        "part": "xc7z020",
-        "banks": {
-            34: {
-                "iostandard": "LVCMOS33",
-                "performance": "HR"
-            }
-        },
-        "signals": [
-            {
-                "name": "led",
-                "direction": "out",
-                "buffer": "obuf",
-                "bank": 34,
-                "pin": "A1",
-                "iostandard": "LVCMOS33"
-            },
-            {
-                "name": "led",
-                "direction": "out",
-                "buffer": "obuf",
-                "bank": 34,
-                "pin": "A2",
-                "iostandard": "LVCMOS33"
-            }
-        ]
-    }
+def test_unique_names_pass():
+    signals = [
+        {"name": "clk", "pin": "A1"},
+        {"name": "rst", "pin": "A2"},
+    ]
+    check_duplicate_names(signals)  # Should not raise
 
-    with pytest.raises(ValueError, match="Duplicate signal name: 'led'"):
-        check(normalized)
+# --- Duplicate pin usage
+def test_duplicate_pins_raises():
+    signals = [
+        {"name": "a", "pin": "A1"},
+        {"name": "b", "pin": "A1"},
+    ]
+    with pytest.raises(ValueError, match=r"(?i)duplicate pin name"):
+        check_duplicate_pins(signals)
 
-def test_duplicate_pins_across_signals_raises():
-    normalized = {
-        "title": "Conflict Pins",
-        "part": "xc7z020",
-        "banks": {
-            34: {
-                "iostandard": "LVCMOS33",
-                "performance": "HR"
-            }
-        },
-        "signals": [
-            {
-                "name": "sig1",
-                "direction": "in",
-                "buffer": "ibuf",
-                "bank": 34,
-                "pin": "A1",
-                "iostandard": "LVCMOS33"
-            },
-            {
-                "name": "sig2",
-                "direction": "in",
-                "buffer": "ibuf",
-                "bank": 34,
-                "pin": "A1",
-                "iostandard": "LVCMOS33"
-            }
-        ]
-    }
+def test_unique_pins_pass():
+    signals = [
+        {"name": "a", "pin": "A1"},
+        {"name": "b", "pin": "A2"},
+    ]
+    check_duplicate_pins(signals)  # Should not raise
 
-    with pytest.raises(ValueError, match=r"Pins .* already claimed"):
-        check(normalized)
+# --- Check bus usage
+def test_bus_on_scalar_pin_ok():
+    signals = [
+        {"name": "scalar", "pin": "A1", "bus": True, "width": 1}
+    ]
+    check_bus_misuse(signals)  # Should not raise
 
+def test_bus_on_scalar_pinset_ok():
+    signals = [
+        {"name": "diff", "pinset": {"p": "A1", "n": "B1"}, "bus": True, "width": 1}
+    ]
+    check_bus_misuse(signals)  # Should not raise
 
-def test_duplicate_pins_across_pins_array_raises():
-    normalized = {
-        "title": "Conflict Pins Array",
-        "part": "xc7z020",
-        "banks": {
-            34: {
-                "iostandard": "LVCMOS33",
-                "performance": "HR"
-            }
-        },
-        "signals": [
-            {
-                "name": "sig1",
-                "direction": "in",
-                "buffer": "ibuf",
-                "bank": 34,
-                "pins": ["A1", "A2"],
-                "iostandard": "LVCMOS33"
-            },
-            {
-                "name": "sig2",
-                "direction": "in",
-                "buffer": "ibuf",
-                "bank": 34,
-                "pins": ["A2", "A3"],
-                "iostandard": "LVCMOS33"
-            }
-        ]
-    }
+def test_bus_on_multibit_pins_ok():
+    signals = [
+        {"name": "data", "pins": ["A1", "A2", "A3"], "bus": True, "width": 3}
+    ]
+    check_bus_misuse(signals)  # Should not raise
 
-    with pytest.raises(ValueError, match=r"Pins .* already claimed"):
-        check(normalized)
+def test_bus_on_multibit_pinset_ok():
+    signals = [
+        {"name": "diff_data", "pinset": {"p": ["A1", "A2"], "n": ["B1", "B2"]}, "bus": True, "width": 2}
+    ]
+    check_bus_misuse(signals)  # Should not raise
 
+# --- Invalid usage of 'bus'
+def test_multibit_bus_false_raises():
+    signals = [
+        {"name": "addr", "pins": ["A1", "A2", "A3"], "bus": False, "width": 3}
+    ]
+    with pytest.raises(ValueError, match="sets 'bus: false'"):
+        check_bus_misuse(signals)
 
-def test_mismatched_pinset_arrays_raises():
-    normalized = {
-        "title": "Mismatched Pinset",
-        "part": "xc7z020",
-        "banks": {
-            34: {
-                "iostandard": "LVCMOS33",
-                "performance": "HR"
-            }
-        },
-        "signals": [
-            {
-                "name": "diff_pair",
-                "direction": "in",
-                "buffer": "ibufds",
-                "bank": 34,
-                "pinset": {
-                    "p": ["A1", "A2"],
-                    "n": ["B1"]
-                },
-                "iostandard": "LVCMOS33"
-            }
-        ]
-    }
-
-    with pytest.raises(ValueError, match="Mismatched pinset width"):
-        check(normalized)
-
-
-def test_valid_pinset_passes():
-    normalized = {
-        "title": "Good Pinset",
-        "part": "xc7z020",
-        "banks": {
-            34: {
-                "iostandard": "LVCMOS33",
-                "performance": "HR"
-            }
-        },
-        "signals": [
-            {
-                "name": "clk",
-                "direction": "in",
-                "buffer": "ibufds",
-                "bank": 34,
-                "pinset": {
-                    "p": ["A1", "A2"],
-                    "n": ["B1", "B2"]
-                },
-                "iostandard": "LVCMOS33"
-            }
-        ]
-    }
-
-    check(normalized)  # Should not raise
-
+def test_multibit_pinset_bus_false_raises():
+    signals = [
+        {"name": "diff_addr", "pinset": {"p": ["A1", "A2"], "n": ["B1", "B2"]}, "bus": False, "width": 2}
+    ]
+    with pytest.raises(ValueError, match="sets 'bus: false'"):
+        check_bus_misuse(signals)
