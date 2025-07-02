@@ -35,6 +35,9 @@ def check(annotated: Dict[str, Any]) -> None:
         ValueError: If semantic violations are found in the input data.
 
     """
+    check_duplicate_names(annotated["signals"])
+    check_bus_misuse(annotated["signals"])
+    check_duplicate_pins(annotated["signals"])
     return
 
 def check_duplicate_names(signals: List[Dict[str, Any]]) -> None:
@@ -56,16 +59,16 @@ def check_duplicate_pins(signals: List[Dict[str, Any]]) -> None:
 def check_bus_misuse(signals: List[Dict[str, Any]]) -> None:
     for sig in signals:
         width = sig.get("width")
-        bus = sig.get("bus", False)
+        bus = sig.get("bus", None)
 
         if width is None:
             raise ValueError(
-                f"Signal '{sig['name']}' is missing a 'width' field — annotate() must run before check()."
+                f"Signal '{sig['name']}' is missing a 'width' field - annotate() must run before check()."
             )
 
         if width > 1 and bus is False:
             raise ValueError(
-                f"Signal '{sig['name']}' has width {width} but sets 'bus: false' — "
+                f"Signal '{sig['name']}' has width {width} but sets 'bus: false' - "
                 f"multi-bit signals must be emitted as buses."
             )
 
