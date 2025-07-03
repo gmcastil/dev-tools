@@ -14,51 +14,25 @@
                     "name": { "type" : "string" },
                     "direction" : { "enum": ["in", "out", "inout"] },
                     "buffer": { "$ref": "defs/buffer.json" },
+                    "bank": { "$ref": "defs/bank.json" },
                     "iostandard": { "$ref": "defs/iostandard.json" },
                     "group": { "$ref": "defs/group.json" },
-                    "bank": { "type": "integer", "minimum": 0 },
-                    "pin": { "type": "string" },
-                    "pins": {
-                        "type": "array",
-                        "items": { "type": "string" },
-                        "minItems": 2
-                    },
-                    "pinset": {
-                        "type": "object",
-                        "oneOf": [
-                            {
-                                "properties": {
-                                    "p": { "type": "string" },
-                                    "n": { "type": "string" }
-                                },
-                                "required": ["p", "n"],
-                                "additionalProperties": false
-                            },
-                            {
-                                "properties": {
-                                    "p": {
-                                        "type": "array",
-                                        "items": { "type": "string" },
-                                        "minItems": 2
-                                    },
-                                    "n": {
-                                        "type": "array",
-                                        "items": { "type": "string" },
-                                        "minItems": 2
-                                    }
-                                },
-                                "required": ["p", "n"],
-                                "additionalProperties": false
-                            }
-                        ]
-                    },
-                    "bus": { "type": "boolean" }
+                    "pin": { "$ref": "defs/pin.json" },
+                    "pins": { "$ref": "defs/pins.json" },
+                    "pinset": { "$ref": "defs/pinset.json" },
+                    "multibank": { "$ref": "defs/multibank.json" },
+                    "bus": { "type": "boolean" },
+                    "offset": {
+                        "type": "integer",
+                        "minimum": 0
+                    }
                 },
-                "required": ["name", "direction", "buffer", "bank"],
+                "required": ["name", "direction", "buffer"],
                 "oneOf": [
                     { "required": ["pin"] },
                     { "required": ["pins"] },
-                    { "required": ["pinset"] }
+                    { "required": ["pinset"] },
+                    { "required": ["multibank"] }
                 ],
                 "additionalProperties": false
             }
@@ -68,19 +42,20 @@
             "items": {
                 "type": "object",
                 "properties": {
-                    "bank": { "type": "integer", "minimum": 0 },
                     "comment": { "type": "string" },
+                    "bank": { "$ref": "defs/bank.json" },
                     "iostandard": { "$ref": "defs/iostandard.json" },
                     "performance": {
                         "type": "string",
                         "enum": ["HD", "HR", "HP"]
                     }
                 },
-                "required": ["bank", "iostandard", "performance"]
+                "required": ["bank", "iostandard", "performance"],
+                "additionalProperties": false
             },
             "additionalProperties": false
         }
     },
-    "required": ["title", "part", "signals", "banks"]
+    "required": ["title", "part", "signals"]
 }
 

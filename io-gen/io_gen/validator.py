@@ -20,6 +20,11 @@ defs = {
         "defs/iostandard.json": json.load((DEFS_DIR / "iostandard.json").open()),
         "defs/buffer.json": json.load((DEFS_DIR / "buffer.json").open()),
         "defs/group.json": json.load((DEFS_DIR / "group.json").open()),
+        "defs/bank.json": json.load((DEFS_DIR / "bank.json").open()),
+        "defs/pin.json": json.load((DEFS_DIR / "pin.json").open()),
+        "defs/pins.json": json.load((DEFS_DIR / "pins.json").open()),
+        "defs/pinset.json": json.load((DEFS_DIR / "pinset.json").open()),
+        "defs/multibank.json": json.load((DEFS_DIR / "multibank.json").open())
 }
 
 resources = {
