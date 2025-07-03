@@ -22,12 +22,15 @@
                     "pinset": { "$ref": "defs/pinset.json" },
                     "multibank": { "$ref": "defs/multibank.json" },
                     "bus": { "type": "boolean" },
-                    "offset": {
-                        "type": "integer",
-                        "minimum": 0
-                    }
+                    "width": { "type": "integer", "minimum": 1 }
                 },
                 "required": ["name", "direction", "buffer"],
+                "allOf": [
+                    {
+                        "if": { "required": ["multibank"] },
+                        "then": { "required": ["width"] }
+                    }
+                ],
                 "oneOf": [
                     { "required": ["pin"] },
                     { "required": ["pins"] },

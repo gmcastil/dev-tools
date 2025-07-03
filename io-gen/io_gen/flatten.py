@@ -1,6 +1,7 @@
 from copy import deepcopy
+from typing import List, Dict, Any
 
-def flatten_signals(signals: list[dict], banks: dict[int, dict]) -> list[dict]:
+def flatten_signals(signals: List[Dict], banks: Dict[int, Dict]) -> List[Dict]:
     """
     Flatten the list of signals, resolving inheritance from bank definitions.
 
@@ -18,6 +19,67 @@ def flatten_signals(signals: list[dict], banks: dict[int, dict]) -> list[dict]:
         ValueError: If a signal references a bank number not present in the bank list.
 
     """
+    flat = []
+
+    for signal in signals:
+        if "pin" in signal:
+            flat.extend(flatten_pin(signal, banks))
+        elif "pins" in signal:
+            flat.extend(flatten_pins(signal, banks))
+        elif "pinset" in signal:
+            flat.extend(flatten_pinset(signal, banks))
+        elif "multibank" in signal:
+            flat.extend(flatten_multibank(signal, banks))
+        else:
+            err = f"Signal '{signal['name']}' has no valid pin definition"
+            raise ValueError(err)
+    
+    return flat
+
+def flatten_pin(signal: dict, banks: Dict[int, dict]) -> list[dict]:
+    signal_c = deepcopy(signal)
+
+    # The index for a single pin is always 0
+    signal_c['index'] = 0
+
+    if 'pin' not in signal:
+        err = f"Signal '{signal_c['name']}' has a missing pin value"
+        raise ValueError(err)
+
+    if 'direction' not in signal:
+        err = f"Signal '{signal_c['name']}' has a missing direction"
+        raise ValueError(err)
+
+    # Check if the signal itself has the IO standard defined
+    if "iostandard" not in signal_c:
+        bank = signal_c.get("bank", None)
+        if bank is not None and bank in banks:
+            signal_c['iostandard'] = banks[bank]['iostandard']
+        else:
+            err = f"Signal '{signal_c['name']}' has no bank or IOSTANDARD defined"
+            raise ValueError(err)
+
+    return [signal_c]
+
+def flatten_pins(signal: dict, banks: dict[int, dict]) -> list[dict]:
+    return
+
+def flatten_pinset(signal: dict, banks: dict[int, dict]) -> list[dict]:
+    return
+
+def flatten_multibank(signal: dict, banks: dict[int, dict]) -> list[dict]:
+    return
+
+
+
+
+
+
+
+
+
+
+
     result = []
     for signal in signals:
         signal_copy = deepcopy(signal)  # Copy because we're going to mutate the signal dict
