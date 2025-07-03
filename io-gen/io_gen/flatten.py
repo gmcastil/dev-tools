@@ -31,24 +31,26 @@ def flatten_signals(signals: List[Dict], banks: Dict[int, Dict]) -> List[Dict]:
         elif "multibank" in signal:
             flat.extend(flatten_multibank(signal, banks))
         else:
-            err = f"Signal '{signal['name']}' has no valid pin definition"
-            raise ValueError(err)
+            msg = f"Signal '{signal['name']}' has no valid pin definition"
+            raise ValueError(msg)
     
     return flat
 
 def flatten_pin(signal: dict, banks: Dict[int, dict]) -> list[dict]:
+    # Going to mangle this and return it, so copy now
     signal_c = deepcopy(signal)
 
-    # The index for a single pin is always 0
-    signal_c['index'] = 0
+    if 'pin' not in signal_c:
+        msg = f"Signal '{signal_c['name']}' has a missing pin value"
+        raise ValueError(msg)
 
-    if 'pin' not in signal:
-        err = f"Signal '{signal_c['name']}' has a missing pin value"
-        raise ValueError(err)
+    if 'direction' not in signal_c:
+        msg = f"Signal '{signal_c['name']}' has a missing direction"
+        raise ValueError(msg)
 
-    if 'direction' not in signal:
-        err = f"Signal '{signal_c['name']}' has a missing direction"
-        raise ValueError(err)
+    # Clean up 'bus' if not explicitly true
+    if signal_c.get("bus") is not True:
+        signal_c.pop("bus", None)
 
     # Check if the signal itself has the IO standard defined
     if "iostandard" not in signal_c:
@@ -56,13 +58,53 @@ def flatten_pin(signal: dict, banks: Dict[int, dict]) -> list[dict]:
         if bank is not None and bank in banks:
             signal_c['iostandard'] = banks[bank]['iostandard']
         else:
-            err = f"Signal '{signal_c['name']}' has no bank or IOSTANDARD defined"
-            raise ValueError(err)
+            msg = f"Signal '{signal_c['name']}' has no bank or IOSTANDARD defined"
+            raise ValueError(msg)
+
+    # The index for a single pin is always 0
+    signal_c['index'] = 0
 
     return [signal_c]
 
 def flatten_pins(signal: dict, banks: dict[int, dict]) -> list[dict]:
-    return
+
+    flattened = []
+    signal_c = deepcopy(signal)
+
+    # Go no further without pins
+    if 'pins' not in signal_c:
+        msg = f"Signal '{signal_c['name']}' has no pins defined"
+        raise ValueError(msg)
+
+    if 'direction' not in signal_c:
+        msg = f"Signal '{signal_c['name']}' has a missing direction"
+        raise ValueError(msg)
+
+    # Clean up 'bus'  - no reason for this to be here, but get rid of it if it is
+    signal_c.pop("bus", None)
+
+    # Now set the iostandard, which may or may not be inherited from the bank
+    if 'iostandard' not in signal_c:
+        bank = signal_c.get("bank", None)
+        if bank is not None and bank in banks:
+            signal_c['iostandard'] = banks[bank]['iostandard']
+        else:
+            msg = f"Signal '{signal_c['name']}' has no bank or IOSTANDARD defined"
+            raise ValueError(msg)
+
+    # Will be iterating over the pins, so need to move this list out of the copy
+    # before mutating and flattening
+    pins = signal_c.pop('pins')
+
+    for index, pin in enumerate(pins):
+        signal_cc = deepcopy(signal_c)
+
+        signal_cc['index'] = index
+        signal_cc['pin'] = pin
+
+        flattened.append(signal_cc)
+
+    return flattened
 
 def flatten_pinset(signal: dict, banks: dict[int, dict]) -> list[dict]:
     return

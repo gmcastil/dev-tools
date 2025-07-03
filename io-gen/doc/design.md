@@ -94,3 +94,7 @@ TBD
     ---
 
 
+# Notes for future
+- Remember to describe the index starting at zero and the order of  pins in arrays being the same.
+- Its not spelled out that the left most entry is the 0th index.
+
