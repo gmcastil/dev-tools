@@ -60,6 +60,39 @@ test_cases = [
         ]
     },
     {
+        "id": "valid_multibank_single_bit_bus",
+        "valid": True,
+        "signal": {
+            "name": "flag",
+            "direction": "in",
+            "buffer": "ibuf",
+            "width": 1,
+            "bus": True,
+            "multibank": [
+                {
+                    "bank": 34,
+                    "offset": 0,
+                    "pin": "A1"
+                }
+            ]
+        },
+        "banks": [
+            {"bank": 34, "iostandard": "LVCMOS33"}
+        ],
+        "expected": [
+            {
+                "name": "flag",
+                "direction": "in",
+                "buffer": "ibuf",
+                "bus": True,
+                "index": 0,
+                "bank": 34,
+                "iostandard": "LVCMOS33",
+                "pin": "A1"
+            }
+        ]
+    },
+    {
         "id": "valid_split_diffpair_across_two_banks",
         "valid": True,
         "signal": {
