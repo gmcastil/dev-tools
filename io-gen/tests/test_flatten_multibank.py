@@ -93,6 +93,70 @@ test_cases = [
         ]
     },
     {
+        "id": "valid_multibank_mixed_iostandard_inheritance",
+        "valid": True,
+        "signal": {
+            "name": "ctrl",
+            "direction": "out",
+            "buffer": "obuf",
+            "width": 4,
+            "multibank": [
+                {
+                    "bank": 34,
+                    "offset": 0,
+                    "pins": ["A1", "A2"]
+                },
+                {
+                    "bank": 35,
+                    "offset": 2,
+                    "pins": ["B1", "B2"]
+                }
+            ]
+        },
+        "banks": [
+            {"bank": 34, "iostandard": "LVCMOS33"},
+            {"bank": 35, "iostandard": "LVCMOS18"}
+        ],
+        "expected": [
+            {
+                "name": "ctrl",
+                "direction": "out",
+                "buffer": "obuf",
+                "bank": 34,
+                "index": 0,
+                "pin": "A1",
+                "iostandard": "LVCMOS33"
+            },
+            {
+                "name": "ctrl",
+                "direction": "out",
+                "buffer": "obuf",
+                "bank": 34,
+                "index": 1,
+                "pin": "A2",
+                "iostandard": "LVCMOS33"
+            },
+            {
+                "name": "ctrl",
+                "direction": "out",
+                "buffer": "obuf",
+                "bank": 35,
+                "index": 2,
+                "pin": "B1",
+                "iostandard": "LVCMOS18"
+            },
+            {
+                "name": "ctrl",
+                "direction": "out",
+                "buffer": "obuf",
+                "bank": 35,
+                "index": 3,
+                "pin": "B2",
+                "iostandard": "LVCMOS18"
+            }
+        ]
+    },
+    {
         "id": "valid_split_diffpair_across_two_banks",
         "valid": True,
         "signal": {
