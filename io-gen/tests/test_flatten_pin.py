@@ -12,7 +12,8 @@ flatten_pin_cases = [
                 "direction": "out",
                 "buffer": "obuf",
                 "pin": "A1",
-                "bank": 34
+                "bank": 34,
+                "bus": False
                 },
             "banks": {
                 34: {"iostandard": "LVCMOS33"}
@@ -25,7 +26,8 @@ flatten_pin_cases = [
                     "bank": 34,
                     "direction": "out",
                     "buffer": "obuf",
-                    "iostandard": "LVCMOS33"
+                    "iostandard": "LVCMOS33",
+                    "bus": False
                     }
                 ]
             },
@@ -51,7 +53,8 @@ flatten_pin_cases = [
                     "bank": 34,
                     "direction": "out",
                     "buffer": "obuf",
-                    "iostandard": "SSTL15"
+                    "iostandard": "SSTL15",
+                    "bus": False
                     }
                 ]
             },
