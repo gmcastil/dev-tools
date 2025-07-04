@@ -180,8 +180,115 @@ def flatten_pinset(signal: dict, banks: dict[int, dict]) -> list[dict]:
     return flattened
 
 def flatten_multibank(signal: dict, banks: dict[int, dict]) -> list[dict]:
-    return
+    flattened = []
+    signal_c = deepcopy(signal)
 
+    width = signal_c.get('width', None)
+    if width is None:
+        msg = f"Signal '{signal_c['name']}' has a missing width"
+        raise ValueError(msg)
+
+    if 'direction' not in signal_c:
+        msg = f"Signal '{signal_c['name']}' has a missing direction"
+        raise ValueError(msg)
+
+    # Before doing anything verify that the shapes are correct
+    multibank = signal_c.pop('multibank', None)
+    if multibank is None:
+        msg = f"Signal '{signal_c['name']}' has no multibank defined"
+        raise ValueError(msg)
+
+    # Handle the single-bit bus flag before processing fragments. The
+    # problematic case is when a multibank signal includes a scalar
+    # 'pin' or 'pinset' fragment and the top-level signal has 'bus:
+    # true'. These scalar fragments are part of a wider bus, so treating
+    # them as standalone 1-bit buses (as 'bus: true' would imply) is
+    # invalid. Since the flatten_* functions operate on fragments
+    # without awareness of the larger multibank context, we must prevent
+    # incorrect propagation of 'bus: true' here. This isn't an entirely
+    # far-fetched idea - the schema can't catch illegal use of the 'bus'
+    # property because it depends on the lengths of the other signals
+    # involved.
+    if len(multibank) == 1 and ('pin' in multibank[0] or 'pinset' in multibank[0]):
+        bus = signal_c.get('bus', False)
+    else:
+        bus = False
+
+    # We already know how to flatten pin, pins, and pinsets, if they look right
+    for fragment in multibank:
+        # So, we make a copy of just the fragment (so, just a bank of pins)
+        fragment_c = deepcopy(fragment)
+
+        # Add fields required for signals before dispatching to the
+        # flattener functions
+        fragment_c['name'] = signal_c['name']
+        fragment_c['direction'] = signal_c['direction']
+        fragment_c['buffer'] = signal_c['buffer']
+
+        # Handling IOSTANDARD is special because we inherit per bank OR defined
+        # for the entire signal
+        iostandard = signal_c.get('iostandard', None)
+        # Now we check to see if iostandard was defined for the top
+        # level signal and if it was, we make it the default - that
+        # means that the flatten functions will get called with the
+        # banks argument, but then not need it.
+        if iostandard is not None:
+            fragment_c['iostandard'] = iostandard
+
+        # Now we insert the bus value we extracted from the top level
+        # signal into the signal fragment, before calling the appropriate
+        # flattener (note that pins doesnt get it)
+        if 'pin' in fragment:
+            fragment_c['bus'] = bus
+            flat_fragment = flatten_pin(fragment_c, banks)
+        elif 'pins' in fragment:
+            flat_fragment = flatten_pins(fragment_c, banks)
+        elif 'pinset' in fragment:
+            fragment_c['bus'] = bus
+            flat_fragment = flatten_pinset(fragment_c, banks)
+        else:
+            msg = f"Signal '{signal['name']}' has no valid pin definition"
+            raise ValueError(msg)
+
+        # Now we need to create the index for each pin in the flattened fragment
+        # based on the offset (iterating over list of pins of flattened fragment
+        # of a multibank entry)
+        try:
+            offset = fragment_c["offset"]  # This should always exist, per schema
+            for index, pin in enumerate(flat_fragment, offset):
+                pin["index"] = index
+                flattened.append(pin)
+        except KeyError:
+            msg = (
+                f"Internal error: expected 'offset' key missing from fragment_c during index assignment.\n"
+                f"This likely indicates an inconsistency in the multibank signal model.\n"
+                f"Fragment entry: {fragment_c.get('name', '<unknown>')}"
+            )
+            raise ValueError(msg)
+
+    # Now remove the internal keys that were added along the way - these
+    # should absolutely all exist and if they don't, it's likely a bug in the
+    # multibank handling
+    for pin in flattened:
+        try:
+            del pin["offset"]
+        except KeyError:
+            msg = (
+                f"Internal error: expected internal key 'offset' not found in flattened signal.\n"
+                f"This likely indicates a bug in multibank flattening or an earlier mutation step.\n"
+                f"Signal entry: {pin.get('name', '<unknown>')}"
+            )
+            raise ValueError(msg)
+
+    flattened_indices = [entry["index"] for entry in flattened]
+    if sorted(flattened_indices) != list(range(width)):
+        raise ValueError(
+            f"Signal '{signal['name']}' has invalid index mapping. "
+            f"Expected contiguous 0..{width-1}, got: {sorted(flattened_indices)}. "
+            "Check offset, pin counts, and declared width."
+        )
+
+    return flattened
 
 def flatten_banks(banks: list[dict]) -> dict[int, dict]:
     """

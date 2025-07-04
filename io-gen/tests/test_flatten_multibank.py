@@ -1,6 +1,8 @@
 import pytest
 from copy import deepcopy
+
 from io_gen.flatten import flatten_multibank
+from tests.utils import assert_flat_signals_equal
 
 test_cases = [
     {
@@ -29,7 +31,7 @@ test_cases = [
             {"bank": 35, "iostandard": "LVCMOS18"}
         ],
         "expected": [
-            {"name": "data_bus", "direction": "out", "buffer": "obuf", "bank": 34, "iostandard": "LVCMOS33", "pin": "A1", "index": 0},
+            {"name": "data_bus", "direction": "out", "buffer": "obuf", "bank": 34, "iostandard": "LVCMOS33", "pin": "A1", "index": 0, "bus": False},
             {"name": "data_bus", "direction": "out", "buffer": "obuf", "bank": 35, "iostandard": "LVCMOS18", "pin": "B1", "index": 1},
             {"name": "data_bus", "direction": "out", "buffer": "obuf", "bank": 35, "iostandard": "LVCMOS18", "pin": "B2", "index": 2},
             {"name": "data_bus", "direction": "out", "buffer": "obuf", "bank": 35, "iostandard": "LVCMOS18", "pin": "B3", "index": 3},
@@ -56,7 +58,7 @@ test_cases = [
             {"bank": 34, "iostandard": "LVCMOS33"}
         ],
         "expected": [
-            {"name": "control", "direction": "in", "buffer": "ibuf", "bank": 34, "iostandard": "LVCMOS33", "pin": "A9", "index": 0}
+            {"name": "control", "direction": "in", "buffer": "ibuf", "bank": 34, "iostandard": "LVCMOS33", "pin": "A9", "index": 0, "bus": False}
         ]
     },
     {
@@ -157,6 +159,70 @@ test_cases = [
         ]
     },
     {
+        "id": "reversed_offsets",
+        "valid": True,
+        "signal": {
+            "name": "bad_signal5",
+            "direction": "in",
+            "buffer": "ibuf",
+            "width": 4,
+            "multibank": [
+                {
+                    "bank": 35,
+                    "offset": 2,
+                    "pins": ["B1", "B2"]
+                },
+                {
+                    "bank": 34,
+                    "offset": 0,
+                    "pins": ["A1", "A2"]
+                }
+            ]
+        },
+        "banks": [
+            {"bank": 34, "iostandard": "LVCMOS33"},
+            {"bank": 35, "iostandard": "LVCMOS33"}
+        ],
+        "expected": [
+            {
+                "name": "bad_signal5",
+                "direction": "in",
+                "buffer": "ibuf",
+                "bank": 34,
+                "iostandard": "LVCMOS33",
+                "pin": "A1",
+                "index": 0
+                },
+            {
+                "name": "bad_signal5",
+                "direction": "in",
+                "buffer": "ibuf",
+                "bank": 34,
+                "iostandard": "LVCMOS33",
+                "pin": "A2",
+                "index": 1
+                },
+            {
+                "name": "bad_signal5",
+                "direction": "in",
+                "buffer": "ibuf",
+                "bank": 35,
+                "iostandard": "LVCMOS33",
+                "pin": "B1",
+                "index": 2
+                },
+            {
+                "name": "bad_signal5",
+                "direction": "in",
+                "buffer": "ibuf",
+                "bank": 35,
+                "iostandard": "LVCMOS33",
+                "pin": "B2",
+                "index": 3
+                }
+            ]
+    },
+    {
         "id": "valid_split_diffpair_across_two_banks",
         "valid": True,
         "signal": {
@@ -188,9 +254,11 @@ test_cases = [
             {"bank": 35, "iostandard": "LVDS_25"}
         ],
         "expected": [
-            {"name": "diff_signal", "direction": "in", "buffer": "ibufds", "bank": 34, "iostandard": "LVDS_25", "p": "A1", "n": "B1", "index": 0},
-            {"name": "diff_signal", "direction": "in", "buffer": "ibufds", "bank": 35, "iostandard": "LVDS_25", "p": "A2", "n": "B2", "index": 1},
-            {"name": "diff_signal", "direction": "in", "buffer": "ibufds", "bank": 35, "iostandard": "LVDS_25", "p": "A3", "n": "B3", "index": 2}
+            {"name": "diff_signal", "direction": "in", "buffer": "ibufds", "bank": 34, "iostandard": "LVDS_25", "p": "A1", "n": "B1", "index": 0, "bus": False},
+            {"name": "diff_signal", "direction": "in", "buffer": "ibufds", "bank": 35, "iostandard": "LVDS_25", "p":
+             "A2", "n": "B2", "index": 1, "bus": False},
+            {"name": "diff_signal", "direction": "in", "buffer": "ibufds", "bank": 35, "iostandard": "LVDS_25", "p":
+             "A3", "n": "B3", "index": 2, "bus": False}
         ]
     }
 ]
@@ -202,7 +270,7 @@ def test_flatten_multibank(case):
 
     if case["valid"]:
         result = flatten_multibank(signal, banks)
-        assert result == case["expected"]
+        assert_flat_signals_equal(result, case['expected'])
     else:
         with pytest.raises(ValueError):
             flatten_multibank(signal, banks)

@@ -1,7 +1,8 @@
 import pytest
-from io_gen.flatten import flatten_pin
+from copy import deepcopy
 
-# --- Test Cases ---
+from io_gen.flatten import flatten_pin
+from tests.utils import assert_flat_signals_equal
 
 flatten_pin_cases = [
         {
@@ -129,9 +130,12 @@ flatten_pin_cases = [
 
 @pytest.mark.parametrize("case", flatten_pin_cases, ids=[c["id"] for c in flatten_pin_cases])
 def test_flatten_pin_cases(case):
+    signal = deepcopy(case['signal'])
+    banks = case['banks']
+
     if case["valid"]:
-        result = flatten_pin(case["signal"], case["banks"])
-        assert result == case["expected"]
+        result = flatten_pin(signal, banks)
+        assert_flat_signals_equal(result, case['expected'])
     else:
         with pytest.raises(Exception):
             flatten_pin(case["signal"], case["banks"])

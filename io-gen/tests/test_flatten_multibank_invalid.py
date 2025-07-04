@@ -91,32 +91,6 @@ test_cases = [
             {"bank": 34, "iostandard": "LVCMOS33"},
             {"bank": 35, "iostandard": "LVCMOS33"}
         ]
-    },
-    {
-        "id": "reversed_offsets",
-        "valid": False,
-        "signal": {
-            "name": "bad_signal5",
-            "direction": "in",
-            "buffer": "ibuf",
-            "width": 4,
-            "multibank": [
-                {
-                    "bank": 35,
-                    "offset": 2,
-                    "pins": ["B1", "B2"]
-                },
-                {
-                    "bank": 34,
-                    "offset": 0,
-                    "pins": ["A1", "A2"]
-                }
-            ]
-        },
-        "banks": [
-            {"bank": 34, "iostandard": "LVCMOS33"},
-            {"bank": 35, "iostandard": "LVCMOS33"}
-        ]
     }
 ]
 
