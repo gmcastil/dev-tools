@@ -44,7 +44,8 @@
     "bank": 35,
     "direction": "in",
     "buffer": "ibufds",
-    "iostandard": "LVDS_25"
+    "iostandard": "LVDS_25",
+    "bus": false
   },
   {
     "name": "lvds_rx",

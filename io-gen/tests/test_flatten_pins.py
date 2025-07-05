@@ -1,7 +1,10 @@
 import pytest
-from io_gen.flatten import flatten_pins
+from copy import deepcopy
 
-flatten_pins_cases = [
+from io_gen.flatten import flatten_pins
+from tests.utils import assert_flat_signals_equal
+
+pins_test_cases = [
     {
         "id": "valid_pins_inherits_iostandard",
         "valid": True,
@@ -23,6 +26,7 @@ flatten_pins_cases = [
                 "bank": 34,
                 "direction": "in",
                 "buffer": "ibuf",
+                "bus": False,
                 "iostandard": "LVCMOS33"
             },
             {
@@ -32,6 +36,7 @@ flatten_pins_cases = [
                 "bank": 34,
                 "direction": "in",
                 "buffer": "ibuf",
+                "bus": False,
                 "iostandard": "LVCMOS33"
             },
             {
@@ -41,6 +46,7 @@ flatten_pins_cases = [
                 "bank": 34,
                 "direction": "in",
                 "buffer": "ibuf",
+                "bus": False,
                 "iostandard": "LVCMOS33"
             }
         ]
@@ -67,6 +73,7 @@ flatten_pins_cases = [
                 "bank": 35,
                 "direction": "out",
                 "buffer": "obuf",
+                "bus": False,
                 "iostandard": "SSTL15"
             },
             {
@@ -76,6 +83,7 @@ flatten_pins_cases = [
                 "bank": 35,
                 "direction": "out",
                 "buffer": "obuf",
+                "bus": False,
                 "iostandard": "SSTL15"
             }
         ]
@@ -109,11 +117,16 @@ flatten_pins_cases = [
     }
 ]
 
-@pytest.mark.parametrize("case", flatten_pins_cases, ids=[c["id"] for c in flatten_pins_cases])
+test_ids = [c["id"] for c in pins_test_cases]
+
+@pytest.mark.parametrize("case", pins_test_cases, ids=test_ids)
 def test_flatten_pins_cases(case):
+    signal = deepcopy(case["signal"])
+    banks = case['banks']
+
     if case["valid"]:
-        result = flatten_pins(case["signal"], case["banks"])
-        assert result == case["expected"]
+        result = flatten_pins(signal, banks)
+        assert_flat_signals_equal(result, case['expected'])
     else:
         with pytest.raises(Exception):
             flatten_pins(case["signal"], case["banks"])

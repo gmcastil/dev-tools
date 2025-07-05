@@ -48,7 +48,7 @@ def flatten_pin(signal: dict, banks: Dict[int, dict]) -> list[dict]:
         msg = f"Signal '{signal_c['name']}' has a missing direction"
         raise ValueError(msg)
 
-    # Clean up 'bus', even if not explicitly true
+    # Set 'bus' even if not included
     signal_c['bus'] = signal_c.get('bus', False)
 
     # Check if the signal itself has the IO standard defined
@@ -81,8 +81,8 @@ def flatten_pins(signal: dict, banks: dict[int, dict]) -> list[dict]:
         msg = f"Signal '{signal_c['name']}' has a missing direction"
         raise ValueError(msg)
 
-    # Clean up 'bus' - no reason for this to be here, but get rid of it if it is
-    signal_c.pop("bus", None)
+    # Set 'bus' to false, even if it was included
+    signal_c['bus'] = False
 
     # Now set the iostandard, which may or may not be inherited from the bank
     if 'iostandard' not in signal_c:
@@ -141,10 +141,10 @@ def flatten_pinset(signal: dict, banks: dict[int, dict]) -> list[dict]:
         # Flatten the pinset pair to two p and n signals
         signal_c['p'] = pinset['p']
         signal_c['n'] = pinset['n']
+        # Set the 'bus' value
+        signal_c['bus'] = signal_c.get('bus', False)
         # A single pinset has an index of 1
         signal_c['index'] = 0
-        # Clean up 'bus', even if not explicitly true
-        signal_c['bus'] = signal_c.get('bus', False)
         flattened.append(signal_c)
 
     elif isinstance(pinset['p'], list):
@@ -152,6 +152,8 @@ def flatten_pinset(signal: dict, banks: dict[int, dict]) -> list[dict]:
         # it has to be checked here and raised on
         p_pins = pinset['p']
         n_pins = pinset['n']
+        # The 'bus' value has to be false here
+        signal_c['bus'] = False
         if len(p_pins) != len(n_pins):
             msg = (
                     f"Signal '{signal['name']}' has mismatched differential pinset lengths: "
@@ -237,14 +239,13 @@ def flatten_multibank(signal: dict, banks: dict[int, dict]) -> list[dict]:
 
         # Now we insert the bus value we extracted from the top level
         # signal into the signal fragment, before calling the appropriate
-        # flattener (note that pins doesnt get it)
+        # flattener
+        fragment_c['bus'] = bus
         if 'pin' in fragment:
-            fragment_c['bus'] = bus
             flat_fragment = flatten_pin(fragment_c, banks)
         elif 'pins' in fragment:
             flat_fragment = flatten_pins(fragment_c, banks)
         elif 'pinset' in fragment:
-            fragment_c['bus'] = bus
             flat_fragment = flatten_pinset(fragment_c, banks)
         else:
             msg = f"Signal '{signal['name']}' has no valid pin definition"

@@ -4,7 +4,7 @@ from copy import deepcopy
 from io_gen.flatten import flatten_pin
 from tests.utils import assert_flat_signals_equal
 
-flatten_pin_cases = [
+pin_test_cases = [
         {
             "id": "basic_pin_inherits_iostandard",
             "valid": True,
@@ -128,7 +128,9 @@ flatten_pin_cases = [
             }
 ]
 
-@pytest.mark.parametrize("case", flatten_pin_cases, ids=[c["id"] for c in flatten_pin_cases])
+test_ids = [c["id"] for c in pin_test_cases]
+
+@pytest.mark.parametrize("case", pin_test_cases, ids=test_ids)
 def test_flatten_pin_cases(case):
     signal = deepcopy(case['signal'])
     banks = case['banks']

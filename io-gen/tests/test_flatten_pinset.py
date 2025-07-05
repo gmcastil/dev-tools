@@ -1,7 +1,10 @@
 import pytest
-from io_gen.flatten import flatten_pinset
+from copy import deepcopy
 
-flatten_pinset_cases = [
+from io_gen.flatten import flatten_pinset
+from tests.utils import assert_flat_signals_equal
+
+pinset_test_cases = [
     {
         "id": "valid_scalar_pinset_differential_pair",
         "valid": True,
@@ -57,6 +60,7 @@ flatten_pinset_cases = [
                 "bank": 35,
                 "direction": "out",
                 "buffer": "obufds",
+                "bus": False,
                 "iostandard": "DIFF_HSTL_I"
             },
             {
@@ -67,6 +71,7 @@ flatten_pinset_cases = [
                 "bank": 35,
                 "direction": "out",
                 "buffer": "obufds",
+                "bus": False,
                 "iostandard": "DIFF_HSTL_I"
             }
         ]
@@ -103,13 +108,16 @@ flatten_pinset_cases = [
     }
 ]
 
-# --- Test Runner ---
+test_ids = [c["id"] for c in pinset_test_cases]
 
-@pytest.mark.parametrize("case", flatten_pinset_cases, ids=[c["id"] for c in flatten_pinset_cases])
+@pytest.mark.parametrize("case", pinset_test_cases, ids=test_ids)
 def test_flatten_pinset_cases(case):
+    signal = deepcopy(case["signal"])
+    banks = case['banks']
+
     if case["valid"]:
-        result = flatten_pinset(case["signal"], case["banks"])
-        assert result == case["expected"]
+        result = flatten_pinset(signal, banks)
+        assert_flat_signals_equal(result, case['expected'])
     else:
         with pytest.raises(Exception):
             flatten_pinset(case["signal"], case["banks"])
