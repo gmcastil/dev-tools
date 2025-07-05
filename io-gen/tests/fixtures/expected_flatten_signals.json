@@ -7,7 +7,7 @@
     "direction": "out",
     "buffer": "obuf",
     "iostandard": "LVCMOS33",
-    "bus": false
+    "as_bus": false
   },
   {
     "name": "data",
@@ -16,7 +16,8 @@
     "bank": 34,
     "direction": "in",
     "buffer": "ibuf",
-    "iostandard": "LVCMOS33"
+    "iostandard": "LVCMOS33",
+    "as_bus": false
   },
   {
     "name": "data",
@@ -25,7 +26,8 @@
     "bank": 34,
     "direction": "in",
     "buffer": "ibuf",
-    "iostandard": "LVCMOS33"
+    "iostandard": "LVCMOS33",
+    "as_bus": false
   },
   {
     "name": "data",
@@ -34,7 +36,8 @@
     "bank": 34,
     "direction": "in",
     "buffer": "ibuf",
-    "iostandard": "LVCMOS33"
+    "iostandard": "LVCMOS33",
+    "as_bus": false
   },
   {
     "name": "clk_diff",
@@ -45,7 +48,7 @@
     "direction": "in",
     "buffer": "ibufds",
     "iostandard": "LVDS_25",
-    "bus": false
+    "as_bus": false
   },
   {
     "name": "lvds_rx",
@@ -55,7 +58,8 @@
     "bank": 35,
     "direction": "in",
     "buffer": "ibufds",
-    "iostandard": "LVDS_25"
+    "iostandard": "LVDS_25",
+    "as_bus": false
   },
   {
     "name": "lvds_rx",
@@ -65,7 +69,8 @@
     "bank": 35,
     "direction": "in",
     "buffer": "ibufds",
-    "iostandard": "LVDS_25"
+    "iostandard": "LVDS_25",
+    "as_bus": false
   },
   {
     "name": "bus",
@@ -74,7 +79,8 @@
     "bank": 34,
     "direction": "out",
     "buffer": "obuf",
-    "iostandard": "LVCMOS33"
+    "iostandard": "LVCMOS33",
+    "as_bus": false
   },
   {
     "name": "bus",
@@ -83,7 +89,8 @@
     "bank": 34,
     "direction": "out",
     "buffer": "obuf",
-    "iostandard": "LVCMOS33"
+    "iostandard": "LVCMOS33",
+    "as_bus": false
   },
   {
     "name": "bus",
@@ -92,7 +99,8 @@
     "bank": 35,
     "direction": "out",
     "buffer": "obuf",
-    "iostandard": "LVDS_25"
+    "iostandard": "LVDS_25",
+    "as_bus": false
   },
   {
     "name": "bus",
@@ -101,7 +109,8 @@
     "bank": 35,
     "direction": "out",
     "buffer": "obuf",
-    "iostandard": "LVDS_25"
+    "iostandard": "LVDS_25",
+    "as_bus": false
   },
   {
     "name": "bus",
@@ -110,7 +119,8 @@
     "bank": 35,
     "direction": "out",
     "buffer": "obuf",
-    "iostandard": "LVDS_25"
+    "iostandard": "LVDS_25",
+    "as_bus": false
   },
   {
     "name": "flag",
@@ -120,7 +130,7 @@
     "direction": "in",
     "buffer": "ibuf",
     "iostandard": "LVCMOS33",
-    "bus": true
+    "as_bus": true
   },
   {
     "name": "clk_single",
@@ -131,6 +141,6 @@
     "direction": "in",
     "buffer": "ibufds",
     "iostandard": "LVDS_25",
-    "bus": true
+    "as_bus": true
   }
 ]

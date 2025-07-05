@@ -26,7 +26,7 @@ pins_test_cases = [
                 "bank": 34,
                 "direction": "in",
                 "buffer": "ibuf",
-                "bus": False,
+                "as_bus": False,
                 "iostandard": "LVCMOS33"
             },
             {
@@ -36,7 +36,7 @@ pins_test_cases = [
                 "bank": 34,
                 "direction": "in",
                 "buffer": "ibuf",
-                "bus": False,
+                "as_bus": False,
                 "iostandard": "LVCMOS33"
             },
             {
@@ -46,7 +46,7 @@ pins_test_cases = [
                 "bank": 34,
                 "direction": "in",
                 "buffer": "ibuf",
-                "bus": False,
+                "as_bus": False,
                 "iostandard": "LVCMOS33"
             }
         ]
@@ -73,7 +73,7 @@ pins_test_cases = [
                 "bank": 35,
                 "direction": "out",
                 "buffer": "obuf",
-                "bus": False,
+                "as_bus": False,
                 "iostandard": "SSTL15"
             },
             {
@@ -83,7 +83,7 @@ pins_test_cases = [
                 "bank": 35,
                 "direction": "out",
                 "buffer": "obuf",
-                "bus": False,
+                "as_bus": False,
                 "iostandard": "SSTL15"
             }
         ]

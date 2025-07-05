@@ -31,7 +31,38 @@ pinset_test_cases = [
                 "direction": "in",
                 "buffer": "ibufds",
                 "iostandard": "DIFF_SSTL15",
-                "bus": False
+                "as_bus": False
+            }
+        ]
+    },
+    {
+        "id": "valid_scalar_pinset_differential_pair_as_bus",
+        "valid": True,
+        "signal": {
+            "name": "clk_as_bus",
+            "direction": "in",
+            "buffer": "ibufds",
+            "pinset": {
+                "p": "C1",
+                "n": "C2"
+            },
+            "bank": 34,
+            "as_bus": True
+        },
+        "banks": {
+            34: {"iostandard": "DIFF_SSTL15"}
+        },
+        "expected": [
+            {
+                "name": "clk_as_bus",
+                "index": 0,
+                "p": "C1",
+                "n": "C2",
+                "bank": 34,
+                "direction": "in",
+                "buffer": "ibufds",
+                "iostandard": "DIFF_SSTL15",
+                "as_bus": True
             }
         ]
     },
@@ -60,7 +91,7 @@ pinset_test_cases = [
                 "bank": 35,
                 "direction": "out",
                 "buffer": "obufds",
-                "bus": False,
+                "as_bus": False,
                 "iostandard": "DIFF_HSTL_I"
             },
             {
@@ -71,7 +102,7 @@ pinset_test_cases = [
                 "bank": 35,
                 "direction": "out",
                 "buffer": "obufds",
-                "bus": False,
+                "as_bus": False,
                 "iostandard": "DIFF_HSTL_I"
             }
         ]

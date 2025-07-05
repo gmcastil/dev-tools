@@ -21,7 +21,7 @@
                     "pins": { "$ref": "defs/pins.json" },
                     "pinset": { "$ref": "defs/pinset.json" },
                     "multibank": { "$ref": "defs/multibank.json" },
-                    "bus": { "type": "boolean" },
+                    "as_bus": { "type": "boolean" },
                     "width": { "type": "integer", "minimum": 1 }
                 },
                 "required": ["name", "direction", "buffer"],

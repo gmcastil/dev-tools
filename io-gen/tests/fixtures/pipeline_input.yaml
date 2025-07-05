@@ -31,6 +31,7 @@ signals:
       p: B1
       n: B2
     bank: 35
+    as_bus: false
 
   # Vector pinset (differential), implicit bus
   - name: lvds_rx
@@ -60,7 +61,7 @@ signals:
     buffer: ibuf
     pin: E1
     bank: 34
-    bus: true
+    as_bus: true
 
   # Scalar pinset, but forced to emit as bus
   - name: clk_single
@@ -70,4 +71,4 @@ signals:
       p: E2
       n: E3
     bank: 35
-    bus: true
+    as_bus: true

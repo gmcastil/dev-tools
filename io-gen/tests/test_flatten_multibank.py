@@ -31,11 +31,11 @@ multibank_test_cases = [
             35: {"iostandard": "LVCMOS18"}
         },
         "expected": [
-            {"name": "data_bus", "direction": "out", "buffer": "obuf", "bank": 34, "iostandard": "LVCMOS33", "pin": "A1", "index": 0, "bus": False},
-            {"name": "data_bus", "direction": "out", "buffer": "obuf", "bank": 35, "iostandard": "LVCMOS18", "pin": "B1", "index": 1, "bus": False},
-            {"name": "data_bus", "direction": "out", "buffer": "obuf", "bank": 35, "iostandard": "LVCMOS18", "pin": "B2", "index": 2, "bus": False},
-            {"name": "data_bus", "direction": "out", "buffer": "obuf", "bank": 35, "iostandard": "LVCMOS18", "pin": "B3", "index": 3, "bus": False},
-            {"name": "data_bus", "direction": "out", "buffer": "obuf", "bank": 35, "iostandard": "LVCMOS18", "pin": "B4", "index": 4, "bus": False}
+            {"name": "data_bus", "direction": "out", "buffer": "obuf", "bank": 34, "iostandard": "LVCMOS33", "pin": "A1", "index": 0, "as_bus": False},
+            {"name": "data_bus", "direction": "out", "buffer": "obuf", "bank": 35, "iostandard": "LVCMOS18", "pin": "B1", "index": 1, "as_bus": False},
+            {"name": "data_bus", "direction": "out", "buffer": "obuf", "bank": 35, "iostandard": "LVCMOS18", "pin": "B2", "index": 2, "as_bus": False},
+            {"name": "data_bus", "direction": "out", "buffer": "obuf", "bank": 35, "iostandard": "LVCMOS18", "pin": "B3", "index": 3, "as_bus": False},
+            {"name": "data_bus", "direction": "out", "buffer": "obuf", "bank": 35, "iostandard": "LVCMOS18", "pin": "B4", "index": 4, "as_bus": False}
         ]
     },
     {
@@ -58,7 +58,7 @@ multibank_test_cases = [
             34: {"iostandard": "LVCMOS33"}
         },
         "expected": [
-            {"name": "control", "direction": "in", "buffer": "ibuf", "bank": 34, "iostandard": "LVCMOS33", "pin": "A9", "index": 0, "bus": False}
+            {"name": "control", "direction": "in", "buffer": "ibuf", "bank": 34, "iostandard": "LVCMOS33", "pin": "A9", "index": 0, "as_bus": False}
         ]
     },
     {
@@ -69,7 +69,7 @@ multibank_test_cases = [
             "direction": "in",
             "buffer": "ibuf",
             "width": 1,
-            "bus": True,
+            "as_bus": True,
             "multibank": [
                 {
                     "bank": 34,
@@ -82,16 +82,7 @@ multibank_test_cases = [
             34: {"iostandard": "LVCMOS33"}
         },
         "expected": [
-            {
-                "name": "flag",
-                "direction": "in",
-                "buffer": "ibuf",
-                "bus": True,
-                "index": 0,
-                "bank": 34,
-                "iostandard": "LVCMOS33",
-                "pin": "A1"
-            }
+            { "name": "flag", "direction": "in", "buffer": "ibuf", "as_bus": True, "index": 0, "bank": 34, "iostandard": "LVCMOS33", "pin": "A1" }
         ]
     },
     {
@@ -120,46 +111,10 @@ multibank_test_cases = [
             35: {"iostandard": "LVCMOS18"}
         },
         "expected": [
-            {
-                "name": "ctrl",
-                "direction": "out",
-                "buffer": "obuf",
-                "bank": 34,
-                "index": 0,
-                "pin": "A1",
-                "bus": False,
-                "iostandard": "LVCMOS33"
-            },
-            {
-                "name": "ctrl",
-                "direction": "out",
-                "buffer": "obuf",
-                "bank": 34,
-                "index": 1,
-                "pin": "A2",
-                "bus": False,
-                "iostandard": "LVCMOS33"
-            },
-            {
-                "name": "ctrl",
-                "direction": "out",
-                "buffer": "obuf",
-                "bank": 35,
-                "index": 2,
-                "pin": "B1",
-                "bus": False,
-                "iostandard": "LVCMOS18"
-            },
-            {
-                "name": "ctrl",
-                "direction": "out",
-                "buffer": "obuf",
-                "bank": 35,
-                "index": 3,
-                "pin": "B2",
-                "bus": False,
-                "iostandard": "LVCMOS18"
-            }
+            { "name": "ctrl", "direction": "out", "buffer": "obuf", "bank": 34, "index": 0, "pin": "A1", "as_bus": False, "iostandard": "LVCMOS33" },
+            { "name": "ctrl", "direction": "out", "buffer": "obuf", "bank": 34, "index": 1, "pin": "A2", "as_bus": False, "iostandard": "LVCMOS33" },
+            { "name": "ctrl", "direction": "out", "buffer": "obuf", "bank": 35, "index": 2, "pin": "B1", "as_bus": False, "iostandard": "LVCMOS18" },
+            { "name": "ctrl", "direction": "out", "buffer": "obuf", "bank": 35, "index": 3, "pin": "B2", "as_bus": False, "iostandard": "LVCMOS18" }
         ]
     },
     {
@@ -188,47 +143,11 @@ multibank_test_cases = [
             35: {"iostandard": "LVCMOS33"}
         },
         "expected": [
-            {
-                "name": "bad_signal5",
-                "direction": "in",
-                "buffer": "ibuf",
-                "bank": 34,
-                "iostandard": "LVCMOS33",
-                "pin": "A1",
-                "bus": False,
-                "index": 0
-                },
-            {
-                "name": "bad_signal5",
-                "direction": "in",
-                "buffer": "ibuf",
-                "bank": 34,
-                "iostandard": "LVCMOS33",
-                "pin": "A2",
-                "bus": False,
-                "index": 1
-                },
-            {
-                "name": "bad_signal5",
-                "direction": "in",
-                "buffer": "ibuf",
-                "bank": 35,
-                "iostandard": "LVCMOS33",
-                "pin": "B1",
-                "bus": False,
-                "index": 2
-                },
-            {
-                "name": "bad_signal5",
-                "direction": "in",
-                "buffer": "ibuf",
-                "bank": 35,
-                "iostandard": "LVCMOS33",
-                "pin": "B2",
-                "bus": False,
-                "index": 3
-                }
-            ]
+            { "name": "bad_signal5", "direction": "in", "buffer": "ibuf", "bank": 34, "iostandard": "LVCMOS33", "pin": "A1", "as_bus": False, "index": 0 },
+            { "name": "bad_signal5", "direction": "in", "buffer": "ibuf", "bank": 34, "iostandard": "LVCMOS33", "pin": "A2", "as_bus": False, "index": 1 },
+            { "name": "bad_signal5", "direction": "in", "buffer": "ibuf", "bank": 35, "iostandard": "LVCMOS33", "pin": "B1", "as_bus": False, "index": 2 },
+            { "name": "bad_signal5", "direction": "in", "buffer": "ibuf", "bank": 35, "iostandard": "LVCMOS33", "pin": "B2", "as_bus": False, "index": 3 }
+        ]
     },
     {
         "id": "valid_split_diffpair_across_two_banks",
@@ -262,9 +181,9 @@ multibank_test_cases = [
             35: {"iostandard": "LVDS_25"}
         },
         "expected": [
-            {"name": "diff_signal", "direction": "in", "buffer": "ibufds", "bank": 34, "iostandard": "LVDS_25", "p": "A1", "n": "B1", "index": 0, "bus": False},
-            {"name": "diff_signal", "direction": "in", "buffer": "ibufds", "bank": 35, "iostandard": "LVDS_25", "p": "A2", "n": "B2", "index": 1, "bus": False},
-            {"name": "diff_signal", "direction": "in", "buffer": "ibufds", "bank": 35, "iostandard": "LVDS_25", "p": "A3", "n": "B3", "index": 2, "bus": False}
+            {"name": "diff_signal", "direction": "in", "buffer": "ibufds", "bank": 34, "iostandard": "LVDS_25", "p": "A1", "n": "B1", "index": 0, "as_bus": False},
+            {"name": "diff_signal", "direction": "in", "buffer": "ibufds", "bank": 35, "iostandard": "LVDS_25", "p": "A2", "n": "B2", "index": 1, "as_bus": False},
+            {"name": "diff_signal", "direction": "in", "buffer": "ibufds", "bank": 35, "iostandard": "LVDS_25", "p": "A3", "n": "B3", "index": 2, "as_bus": False}
         ]
     }
 ]
