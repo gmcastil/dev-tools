@@ -236,7 +236,7 @@ def flatten_multibank(signal: dict, banks: dict[int, dict]) -> list[dict]:
         if iostandard is not None:
             fragment_c['iostandard'] = iostandard
 
-        # Now we insert the bus value we extracted from the top level
+        # Now we insert the 'as_bus' value we extracted from the top level
         # signal into the signal fragment, before calling the appropriate
         # flattener
         fragment_c['as_bus'] = as_bus
