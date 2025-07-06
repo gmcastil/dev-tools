@@ -48,10 +48,7 @@
                     "comment": { "type": "string" },
                     "bank": { "$ref": "defs/bank.json" },
                     "iostandard": { "$ref": "defs/iostandard.json" },
-                    "performance": {
-                        "type": "string",
-                        "enum": ["HD", "HR", "HP"]
-                    }
+                    "performance": { "$ref": "defs/performance.json" }
                 },
                 "required": ["bank", "iostandard", "performance"],
                 "additionalProperties": false
