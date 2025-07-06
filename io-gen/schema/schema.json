@@ -41,17 +41,18 @@
             }
         },
         "banks": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "comment": { "type": "string" },
-                    "bank": { "$ref": "defs/bank.json" },
-                    "iostandard": { "$ref": "defs/iostandard.json" },
-                    "performance": { "$ref": "defs/performance.json" }
-                },
-                "required": ["bank", "iostandard", "performance"],
-                "additionalProperties": false
+            "type": "object",
+            "patternProperties": {
+                "^[0-9]+$": {
+                    "type": "object",
+                    "properties": {
+                        "iostandard": { "$ref": "defs/iostandard.json" },
+                        "performance": { "$ref": "defs/performance.json" },
+                        "comment": { "type": "string" }
+                    },
+                    "required": ["iostandard", "performance"],
+                    "additionalProperties": false
+                }
             },
             "additionalProperties": false
         }
