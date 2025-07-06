@@ -1,0 +1,90 @@
+part: xc7z010clg400-1
+
+banks:
+  34:
+    iostandard: LVCMOS33
+    performance: HD
+    comment: "Primary IO bank"
+
+  35:
+    iostandard: LVCMOS18
+    performance: HR
+    comment: "Low-voltage IO bank"
+
+signals:
+  - name: led
+    pin: A1
+    direction: out
+    buffer: obuf
+    comment: "User LED"
+    group: status
+
+  - name: data
+    pins: [A2, A3, A4]
+    direction: in
+    buffer: ibuf
+    width: 3
+    comment: "Parallel data input"
+    group: data
+
+  - name: clk_diff
+    pinset:
+      p: B1
+      n: B2
+    direction: in
+    buffer: ibufds
+    comment: "Differential clock input"
+    group: clock
+
+  - name: multibank_bus
+    multibank:
+      - bank: 34
+        pins: [C1, C2]
+      - bank: 35
+        pins: [D1, D2]
+    direction: out
+    buffer: obuf
+    width: 4
+    comment: "Cross-bank output bus"
+    group: control
+
+  - name: scalar_bus
+    pin: E1
+    direction: in
+    buffer: ibuf
+    comment: "Scalar input treated as a 1-bit bus"
+    group: test
+    as_bus: true
+
+  - name: pinset_bus
+    pinset:
+      p: E2
+      n: E3
+    direction: out
+    buffer: obufds
+    comment: "Differential output treated as 1-bit bus"
+    group: test
+    as_bus: true
+
+  - name: mb_diff_bus
+    multibank:
+      - bank: 34
+        pinset:
+          p: F1
+          n: F2
+    direction: in
+    buffer: ibufds
+    width: 1
+    comment: "Multibank differential 1-bit bus"
+    group: test
+    as_bus: true
+
+  - name: diff_array
+    pinsets:
+      p: [G1, G3]
+      n: [G2, G4]
+    direction: out
+    buffer: obufds
+    width: 2
+    comment: "Differential array output"
+    group: test
