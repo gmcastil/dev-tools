@@ -12,7 +12,7 @@
                 "type": "object",
                 "properties": {
                     "name": { "type" : "string" },
-                    "direction" : { "enum": ["in", "out", "inout"] },
+                    "direction" : { "$ref": "defs/direction.json" },
                     "buffer": { "$ref": "defs/buffer.json" },
                     "bank": { "$ref": "defs/bank.json" },
                     "iostandard": { "$ref": "defs/iostandard.json" },
@@ -21,7 +21,7 @@
                     "pins": { "$ref": "defs/pins.json" },
                     "pinset": { "$ref": "defs/pinset.json" },
                     "multibank": { "$ref": "defs/multibank.json" },
-                    "as_bus": { "type": "boolean" },
+                    "as_bus": { "type": "boolean", "default": false },
                     "width": { "type": "integer", "minimum": 1 }
                 },
                 "required": ["name", "direction", "buffer"],

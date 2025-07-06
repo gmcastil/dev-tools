@@ -3,6 +3,7 @@ Validate input data before processing
 """
 import json
 from pathlib import Path
+from typing import List, Dict, Any
 
 from referencing import Registry, Resource
 from jsonschema.exceptions import ValidationError
@@ -19,6 +20,7 @@ with open(SCHEMA_PATH) as f:
 defs = {
         "defs/iostandard.json": json.load((DEFS_DIR / "iostandard.json").open()),
         "defs/buffer.json": json.load((DEFS_DIR / "buffer.json").open()),
+        "defs/direction.json": json.load((DEFS_DIR / "direction.json").open()),
         "defs/group.json": json.load((DEFS_DIR / "group.json").open()),
         "defs/bank.json": json.load((DEFS_DIR / "bank.json").open()),
         "defs/pin.json": json.load((DEFS_DIR / "pin.json").open()),
@@ -48,4 +50,33 @@ def validate(data: dict) -> None:
 
     """
     validator.validate(data)
+
+def load_enum_values(schema_path: Path) -> List[str]:
+    """Load the list of enum values from a JSON schema fragment.
+
+    Useful for getting the enumerated values like IOSTANDARD, buffer types, directions,
+    from JSON into Python without having to hard code values (and breaking tests when
+    the supported types and so forth change).
+
+    Args:
+        schema_path: Path to a schema file with an "enum" key.
+
+    Returns:
+        A list of allowed enum values.
+
+    Raises:
+        ValueError: If the file doesn't contain an 'enum' key.
+
+    """
+    with schema_path.open("r", encoding="utf-8") as f:
+        schema = json.load(f)
+
+    if "enum" not in schema:
+        raise ValueError(f"Schema {schema_path} has no 'enum' key.")
+
+    values = schema["enum"]
+    if not isinstance(values, list) or not all(isinstance(v, str) for v in values):
+        raise ValueError(f"Invalid enum contents in {schema_path}: {values}")
+
+    return values
 
