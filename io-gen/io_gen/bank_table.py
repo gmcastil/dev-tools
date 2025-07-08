@@ -1,7 +1,10 @@
 from typing import Dict, Any
 
 # These should get pulled from JSON
-ALLOWED_PERFORMANCE = {"HP", "HR", "HD"}
+ENUM_BANK_PERFORMANCE = {"HP", "HR", "HD"}
+
+def extract_bank_table(banks: Dict[str, Dict[str, Any]]) -> Dict[int, Dict[str, Any]]:
+    """Convert string-keyed YAML bank dict to int-keyed bank table with validated entries."""
 
 def extract_bank_table(banks: Dict[int, Dict[str, Any]]) -> Dict[int, Dict[str, Any]]:
     """
@@ -19,7 +22,6 @@ def extract_bank_table(banks: Dict[int, Dict[str, Any]]) -> Dict[int, Dict[str, 
         bank number and each value is a dict of attributes like `iostandard` and `performance`.
     """
     return banks
-
 
 def validate_bank_table(bank_table: Dict[int, Dict[str, Any]]) -> None:
     """
@@ -39,7 +41,7 @@ def validate_bank_table(bank_table: Dict[int, Dict[str, Any]]) -> None:
             raise ValueError(f"Bank {bank_num} is missing required key 'iostandard'")
         if "performance" not in entry:
             raise ValueError(f"Bank {bank_num} is missing required key 'performance'")
-        if entry["performance"] not in ALLOWED_PERFORMANCE:
+        if entry["performance"] not in ENUM_BANK_PERFORMANCE:
             raise ValueError(
                 f"Bank {bank_num} has invalid performance type: {entry['performance']}"
             )

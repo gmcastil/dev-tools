@@ -2,15 +2,31 @@ import pytest
 from io_gen.bank_table import extract_bank_table, validate_bank_table
 from tests.fixtures import get_banks
 
+
+
 def test_extract_bank_table_valid():
     banks = get_banks()
     bank_table = extract_bank_table(banks)
 
-    assert isinstance(bank_table, dict)
-    assert 34 in bank_table
-    assert bank_table[34]["iostandard"] == "LVCMOS33"
-    assert bank_table[34]["performance"] == "HD"
+    expected = {
+            34: {
+                "iostandard": "LVCMOS33",
+                "performance": "HD",
+                "comment": "Primary high-drive bank"
+                },
+            35: {
+                "iostandard": "LVDS",
+                "performance": "HR",
+                "comment": "Differential-capable bank"
+                },
+            36: {
+                "iostandard": "LVCMOS18",
+                "performance": "HR",
+                "comment": "Low-voltage bank"
+                }
+            }
 
+    assert expected == bank_table
 
 def test_validate_bank_table_valid():
     banks = get_banks()
@@ -18,7 +34,6 @@ def test_validate_bank_table_valid():
 
     # Should not raise
     validate_bank_table(bank_table)
-
 
 def test_missing_iostandard_raises():
     bad = {

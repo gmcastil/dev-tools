@@ -19,6 +19,7 @@ PROJ_FILES		:= $(shell git ls-files)
 # Keywords to filter tests on (defaults to everything)
 TESTS			?= ""
 COVERAGE_ARGS		:= --cov=$(PKG_NAME) --cov-report=term-missing
+TEST_ARGS		:= ""
 
 $(VENV_INSTALLED_STAMP): requirements.txt
 	@$(PRINTF) '%s\n' "Initializing virtual environment"
@@ -28,7 +29,7 @@ $(VENV_INSTALLED_STAMP): requirements.txt
 	$(TOUCH) $(VENV_INSTALLED_STAMP)
 
 test: $(VENV_INSTALLED_STAMP)
-	@$(PYTHON) -m pytest -k $(TESTS)
+	@$(PYTHON) -m pytest -k $(TESTS) $(TEST_ARGS)
 
 debug: $(VENV_INSTALLED_STAMP)
 	$(PYTHON) -m pytest -k $(TESTS) -s --pdb

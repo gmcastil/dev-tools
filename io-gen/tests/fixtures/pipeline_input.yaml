@@ -1,90 +1,84 @@
-part: xc7z010clg400-1
-
+title: Canonical IO Pipeline Example
+part: xc7z020clg400-1
 banks:
   34:
     iostandard: LVCMOS33
     performance: HD
-    comment: "Primary IO bank"
-
+    comment: Primary high-drive bank
   35:
+    iostandard: LVDS
+    performance: HR
+    comment: Differential-capable bank
+  36:
     iostandard: LVCMOS18
     performance: HR
-    comment: "Low-voltage IO bank"
-
+    comment: Low-voltage bank
 signals:
-  - name: led
-    pin: A1
-    direction: out
-    buffer: obuf
-    comment: "User LED"
-    group: status
-
-  - name: data
-    pins: [A2, A3, A4]
-    direction: in
-    buffer: ibuf
-    width: 3
-    comment: "Parallel data input"
-    group: data
-
-  - name: clk_diff
-    pinset:
-      p: B1
-      n: B2
-    direction: in
-    buffer: ibufds
-    comment: "Differential clock input"
-    group: clock
-
-  - name: multibank_bus
-    multibank:
-      - bank: 34
-        pins: [C1, C2]
-      - bank: 35
-        pins: [D1, D2]
-    direction: out
-    buffer: obuf
-    width: 4
-    comment: "Cross-bank output bus"
-    group: control
-
-  - name: scalar_bus
+- name: reset_n
+  pin: A1
+  bank: 34
+  direction: in
+  buffer: ibuf
+  as_bus: true
+- name: led0
+  pin: A2
+  bank: 34
+  direction: out
+  buffer: obuf
+  as_bus: false
+- name: gpio
+  pins: [A3, A4, A5, A6]
+  bank: 34
+  direction: inout
+  buffer: ibuf
+  width: 4
+- name: clk_diff
+  pinset:
+    p: B1
+    n: B2
+  bank: 35
+  direction: in
+  buffer: ibufds
+  as_bus: false
+- name: diff_data
+  pinset:
+    p: [B3, B5]
+    n: [B4, B6]
+  bank: 35
+  direction: in
+  buffer: ibufds
+  width: 2
+- name: data_bus
+  multibank:
+  - bank: 34
+    pins: [C1, C2]
+    offset: 0
+  - bank: 36
+    pins: [D1, D2]
+    offset: 2
+  direction: out
+  buffer: obuf
+  width: 4
+- name: flag
+  multibank:
+  - bank: 34
     pin: E1
-    direction: in
-    buffer: ibuf
-    comment: "Scalar input treated as a 1-bit bus"
-    group: test
-    as_bus: true
-
-  - name: pinset_bus
+    offset: 0
+  direction: in
+  buffer: ibuf
+  width: 1
+- name: sync_diff
+  multibank:
+  - bank: 35
     pinset:
-      p: E2
-      n: E3
-    direction: out
-    buffer: obufds
-    comment: "Differential output treated as 1-bit bus"
-    group: test
-    as_bus: true
-
-  - name: mb_diff_bus
-    multibank:
-      - bank: 34
-        pinset:
-          p: F1
-          n: F2
-    direction: in
-    buffer: ibufds
-    width: 1
-    comment: "Multibank differential 1-bit bus"
-    group: test
-    as_bus: true
-
-  - name: diff_array
-    pinsets:
-      p: [G1, G3]
-      n: [G2, G4]
-    direction: out
-    buffer: obufds
-    width: 2
-    comment: "Differential array output"
-    group: test
+      p: F1
+      n: F2
+    offset: 0
+  - bank: 35
+    pinset:
+      p: F3
+      n: F4
+    offset: 1
+  direction: out
+  buffer: obufds
+  width: 2
