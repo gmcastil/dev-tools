@@ -42,21 +42,20 @@
         },
         "banks": {
             "type": "object",
-            "patternProperties": {
-                "^[0-9]+$": {
-                    "type": "object",
-                    "properties": {
-                        "iostandard": { "$ref": "defs/iostandard.json" },
-                        "performance": { "$ref": "defs/performance.json" },
-                        "comment": { "type": "string" }
-                    },
-                    "required": ["iostandard", "performance"],
-                    "additionalProperties": false
-                }
+            "propertyNames": {
+                "pattern": "^[0-9]+$"
             },
-            "additionalProperties": false
+            "additionalProperties": {
+                "type": "object",
+                "properties": {
+                    "iostandard": { "$ref": "defs/iostandard.json" },
+                    "performance": { "$ref": "defs/performance.json" },
+                    "comment": { "type": "string" }
+                },
+                "required": ["iostandard", "performance"],
+                "additionalProperties": false
+            }
         }
     },
     "required": ["title", "part", "signals"]
 }
-
