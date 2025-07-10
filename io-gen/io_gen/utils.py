@@ -1,3 +1,5 @@
+from typing import Any
+
 def is_pin(signal: dict) -> bool:
     return 'pin' in signal and isinstance(signal['pin'], str)
 
@@ -91,4 +93,35 @@ def is_mixed_multibank(signal: dict) -> bool:
 
     return len(set(fragment_types)) > 1
 
+def is_single_ended_signal(pins: list[dict[str, Any]]) -> bool:
+    """Determine if a signal is composed entirely of single-ended pins.
+
+    Args:
+        pins: The list of flattened pin entries for a single signal.
+
+    Returns:
+        True if all pins are single-ended (have 'pin' key),
+        False if all pins are differential (have 'p' and 'n' keys).
+
+    Raises:
+        ValueError: If the pin types are mixed or malformed.
+
+    """
+    is_single = False
+    is_diff = False
+
+    for pin in pins:
+        if 'pin' in pin:
+            is_single = True
+        elif 'p' in pin and 'n' in pin:
+            is_diff = True
+        else:
+            msg = f"malformed pin entry: {pin}"
+            raise ValueError(msg)
+
+        if is_single and is_diff:
+            msg = f"Mixed single-ended and differential pins in signal"
+            raise ValueError(msg)
+
+    return is_single
 
