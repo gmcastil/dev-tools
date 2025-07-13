@@ -1,0 +1,7 @@
+title: Missing Direction
+part: xc7z020clg400-1
+signals:
+  - name: led
+    buffer: obuf
+    pins: A1
+

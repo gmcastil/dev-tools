@@ -1,0 +1,9 @@
+title: Scalar With Width
+part: xc7z020clg400-1
+signals:
+  - name: led
+    direction: out
+    buffer: obuf
+    pins: A1
+    width: 1
+banks: {}

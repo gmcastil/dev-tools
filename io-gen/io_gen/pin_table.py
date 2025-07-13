@@ -28,9 +28,9 @@ def extract_pin_table(
     for sig in signals:
 
         sig_name = sig['name']
-        if is_pin(sig):
-            flattened_pins = flatten_signal_pin_scalar(sig, bank_table)
-        elif is_pins(sig):
+        if is_pins_scalar(sig):
+            flattened_pins = flatten_signal_pins_scalar(sig, bank_table)
+        elif is_pins_array(sig):
             flattened_pins = flatten_signal_pins_array(sig, bank_table)
         elif is_pinset_scalar(sig):
             flattened_pins = flatten_signal_pinset_scalar(sig, bank_table)
@@ -98,17 +98,32 @@ def make_pin_table_entry_stub(signal: dict, banks: dict[int, dict]) -> dict[str,
 
     return pin_entry_stub
 
-def flatten_signal_pin_scalar(signal: dict, banks: dict[int, dict]) -> list[dict]:
+def flatten_signal_pins_scalar(signal: dict, banks: dict[int, dict]) -> list[dict]:
     """Flatten a single-ended scalar signal into one pin entry."""
-    if not is_pin(signal):
+    if not is_pins_scalar(signal):
         msg = f"Signal '{signal['name']}' is not a scalar pin"
         raise ValueError(msg)
 
     pin_table_entry = make_pin_table_entry_stub(signal, banks)
-    pin_table_entry['pin'] = signal['pin']
+    pin_table_entry['pin'] = signal['pins']
     pin_table_entry['index'] = 0
 
     return [pin_table_entry]
+
+def flatten_signal_pins_array(signal: dict, banks: dict[int, dict]) -> list[dict]:
+    """Flatten a single-ended array signal into multiple indexed pin entries."""
+    if not is_pins_array(signal):
+        msg = f"Signal '{signal['name']}' is not an array of pins"
+        raise ValueError(msg)
+
+    result = []
+    for index, pin in enumerate(signal['pins']):
+        pin_table_entry = make_pin_table_entry_stub(signal, banks)
+        pin_table_entry['pin'] = pin
+        pin_table_entry['index']  = index
+        result.append(pin_table_entry)
+
+    return result
 
 def flatten_signal_pinset_scalar(signal: dict, banks: dict[int, dict]) -> list[dict]:
     """Flatten a differential scalar signal into one pinset entry."""
@@ -122,21 +137,6 @@ def flatten_signal_pinset_scalar(signal: dict, banks: dict[int, dict]) -> list[d
     pin_table_entry['index'] = 0
 
     return [pin_table_entry]
-
-def flatten_signal_pins_array(signal: dict, banks: dict[int, dict]) -> list[dict]:
-    """Flatten a single-ended array signal into multiple indexed pin entries."""
-    if not is_pins(signal):
-        msg = f"Signal '{signal['name']}' is not an array of pins"
-        raise ValueError(msg)
-
-    result = []
-    for index, pin in enumerate(signal['pins']):
-        pin_table_entry = make_pin_table_entry_stub(signal, banks)
-        pin_table_entry['pin'] = pin
-        pin_table_entry['index']  = index
-        result.append(pin_table_entry)
-
-    return result
 
 def flatten_signal_pinset_array(signal: dict, banks: dict[int, dict]) -> list[dict]:
     """Flatten a differential array signal into multiple indexed pinset entries."""
@@ -200,9 +200,9 @@ def flatten_signal_multibank(signal: dict, banks: dict[int, dict]) -> list[dict]
         if 'iostandard' in signal_c:
             fragment['iostandard'] = signal_c['iostandard']
 
-        if is_pin(fragment):
-            flattened = flatten_signal_pin_scalar(fragment, banks)
-        elif is_pins(fragment):
+        if is_pins_scalar(fragment):
+            flattened = flatten_signal_pins_scalar(fragment, banks)
+        elif is_pins_array(fragment):
             flattened = flatten_signal_pins_array(fragment, banks)
         elif is_pinset_scalar(fragment):
             flattened = flatten_signal_pinset_scalar(fragment, banks)

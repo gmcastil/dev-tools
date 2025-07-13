@@ -1,0 +1,9 @@
+title: Unknown Field
+part: xc7z020clg400-1
+signals:
+  - name: led
+    direction: out
+    buffer: obuf
+    pins: A1
+    unexpected: true
+banks: {}

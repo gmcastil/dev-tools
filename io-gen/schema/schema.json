@@ -17,22 +17,75 @@
                     "bank": { "$ref": "defs/bank.json" },
                     "iostandard": { "$ref": "defs/iostandard.json" },
                     "group": { "$ref": "defs/group.json" },
-                    "pin": { "$ref": "defs/pin.json" },
                     "pins": { "$ref": "defs/pins.json" },
                     "pinset": { "$ref": "defs/pinset.json" },
                     "multibank": { "$ref": "defs/multibank.json" },
-                    "as_bus": { "type": "boolean", "default": false },
-                    "width": { "type": "integer", "minimum": 1 }
+                    "width": { "type": "integer", "minimum": 1 },
+                    "generate": {
+                        "type": "boolean",
+                        "default": true
+                    },
+                    "comment": {
+                        "type": "object",
+                        "properties": {
+                            "xdc": { "type": "string"},
+                            "hdl": { "type": "string"}
+                        },
+                        "additionalProperties": false
+                    }
                 },
-                "required": ["name", "direction", "buffer"],
                 "allOf": [
                     {
-                        "if": { "required": ["multibank"] },
-                        "then": { "required": ["width"] }
+                        "if": {
+                            "properties": {
+                                "generate": { "const": false }
+                            }
+                        },
+                        "then": {
+                            "required": ["name"]
+                        },
+                        "else": {
+                            "required": ["name", "direction", "buffer"]
+                        }
+                    },
+                    {
+                        "if": {
+                            "required": ["multibank"]
+                        },
+                        "then": {
+                            "required": ["width"]
+                        }
+                    },
+                    {
+                        "if": { 
+                            "properties": {
+                                "pins": { "type": "array" }
+                            },
+                            "required": ["pins"]
+                        },
+                        "then": {
+                            "required": ["width"]
+                        }
+                    },
+                    {
+                        "if": {
+                            "required": ["pinset"],
+                            "properties": {
+                                "pinset": {
+                                    "type": "object",
+                                    "required": ["p"],
+                                    "properties": {
+                                        "p": { "type": "array" }
+                                    }
+                                }
+                            }
+                        },
+                        "then": {
+                            "required": ["width"]
+                        }
                     }
                 ],
                 "oneOf": [
-                    { "required": ["pin"] },
                     { "required": ["pins"] },
                     { "required": ["pinset"] },
                     { "required": ["multibank"] }

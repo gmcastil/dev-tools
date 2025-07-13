@@ -40,18 +40,18 @@ def extract_signal_table(signals: List[Dict[str, Any]]) -> Dict[str, Dict[str, A
                 }
 
         # The 'as_bus' property needs some careful handling
-        if is_pin(sig) or is_pinset_scalar(sig):
+        if is_pins_scalar(sig) or is_pinset_scalar(sig):
             entry['as_bus'] = sig.get('as_bus', False)
         else:
             entry['as_bus'] = False
 
         # Width is optional for some pin types, which makes it annoying
         # to set properly
-        if is_pin(sig) or is_pinset_scalar(sig):
+        if is_pins_scalar(sig) or is_pinset_scalar(sig):
             entry['width'] = sig.get('width', 1)
 
         # Width is required for pins, pinset arrays and multibank
-        elif is_pins(sig) or is_pinset_array(sig) or is_multibank(sig):
+        elif is_pins_array(sig) or is_pinset_array(sig) or is_multibank(sig):
             if 'width' in sig:
                 entry['width'] = sig['width']
             else:

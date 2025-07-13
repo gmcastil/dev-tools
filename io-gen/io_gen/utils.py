@@ -1,9 +1,9 @@
 from typing import Any
 
-def is_pin(signal: dict) -> bool:
-    return 'pin' in signal and isinstance(signal['pin'], str)
+def is_pins_scalar(signal: dict) -> bool:
+    return 'pins' in signal and isinstance(signal['pins'], str)
 
-def is_pins(signal: dict) -> bool:
+def is_pins_array(signal: dict) -> bool:
     return 'pins' in signal and isinstance(signal['pins'], list)
 
 def is_pinset_scalar(signal: dict) -> bool:
@@ -83,8 +83,8 @@ def is_mixed_multibank(signal: dict) -> bool:
     # differential pairs. It isn't somethign that makes much sense
     fragment_types = []
     for fragment in signal['multibank']:
-        if 'pin' in fragment or 'pins' in fragment:
-            fragment_types.append('pin')
+        if 'pins' in fragment:
+            fragment_types.append('pins')
         elif 'pinset' in fragment:
             fragment_types.append('pinset')
         else:
@@ -100,7 +100,7 @@ def is_single_ended_signal(pins: list[dict[str, Any]]) -> bool:
         pins: The list of flattened pin entries for a single signal.
 
     Returns:
-        True if all pins are single-ended (have 'pin' key),
+        True if all pins are single-ended (have 'pins' key),
         False if all pins are differential (have 'p' and 'n' keys).
 
     Raises:

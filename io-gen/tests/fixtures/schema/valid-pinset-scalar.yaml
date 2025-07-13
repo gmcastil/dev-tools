@@ -1,0 +1,10 @@
+title: Pinset Scalar
+part: xc7z020clg400-1
+signals:
+  - name: clk_diff
+    direction: in
+    buffer: ibuf
+    pinset:
+      p: C1
+      n: C2
+banks: {}

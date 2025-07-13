@@ -1,8 +1,14 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "description": "TBD",
-    "type": "array",
-    "items": { "type": "string" },
-    "minItems": 2,
-    "additionalProperties": false
+    "description": "Single-ended signal - either a single pin (str) or  a bus (array of str)",
+    "oneOf": [
+        { "type": "string" },
+        { 
+            "type": "array",
+            "items": { "type": "string" },
+            "minItems": 1,
+            "uniqueItems": true
+        }
+    ]
 }
+

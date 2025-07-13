@@ -70,8 +70,8 @@ def test_valid_signal_table_passes():
 
 def test_duplicate_signal_name_raises():
     signals = [
-        {"name": "dup", "pin": "A1", "buffer": "ibuf", "direction": "in"},
-        {"name": "dup", "pin": "A2", "buffer": "ibuf", "direction": "in"}
+        {"name": "dup", "pins": "A1", "buffer": "ibuf", "direction": "in"},
+        {"name": "dup", "pins": "A2", "buffer": "ibuf", "direction": "in"}
     ]
     with pytest.raises(ValueError, match=r"(i?)uplicate signal name"):
         signal_table = extract_signal_table(signals)

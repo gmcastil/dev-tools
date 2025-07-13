@@ -1,0 +1,10 @@
+title: Multibank Missing Width
+part: xc7z020clg400-1
+signals:
+  - name: data
+    direction: in
+    buffer: ibuf
+    multibank:
+      - bank: 34
+        pins: [A1, A2]
+banks: {}

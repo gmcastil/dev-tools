@@ -15,13 +15,13 @@ banks:
     comment: Low-voltage bank
 signals:
 - name: reset_n
-  pin: A1
+  pins: A1
   bank: 34
   direction: in
   buffer: ibuf
   as_bus: true
 - name: led0
-  pin: A2
+  pins: A2
   bank: 34
   direction: out
   buffer: obuf
@@ -62,7 +62,7 @@ signals:
 - name: flag
   multibank:
   - bank: 34
-    pin: E1
+    pins: E1
     offset: 0
   direction: in
   buffer: ibuf

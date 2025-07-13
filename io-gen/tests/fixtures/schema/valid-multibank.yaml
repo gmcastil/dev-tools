@@ -1,0 +1,15 @@
+title: Multibank Signal
+part: xc7z020clg400-1
+signals:
+  - name: mb_data
+    direction: out
+    buffer: obuf
+    multibank:
+      - bank: 34
+        pins: [A1, A2]
+        offset: 0
+      - bank: 35
+        pins: [B1, B2]
+        offset: 2
+    width: 4
+banks: {}

@@ -1,0 +1,11 @@
+title: Pinset Bus
+part: xc7z020clg400-1
+signals:
+  - name: clk_bus
+    direction: in
+    buffer: ibuf
+    pinset:
+      p: [C1, C2]
+      n: [C3, C4]
+    width: 2
+banks: {}

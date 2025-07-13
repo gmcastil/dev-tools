@@ -1,0 +1,9 @@
+title: Bus Pin
+part: xc7z020clg400-1
+signals:
+  - name: data
+    direction: in
+    buffer: ibuf
+    pins: [A1, A2]
+    width: 2
+banks: {}

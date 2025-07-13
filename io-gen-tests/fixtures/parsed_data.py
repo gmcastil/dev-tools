@@ -1,7 +1,7 @@
 import yaml
 import pathlib
 
-FIXTURE_PATH = pathlib.Path(__file__).parent / "arty-z7-20.yaml"
+FIXTURE_PATH = pathlib.Path(__file__).parent / "pipeline_input.yaml"
 
 def load_pipeline_input():
     with open(FIXTURE_PATH, "r") as f:

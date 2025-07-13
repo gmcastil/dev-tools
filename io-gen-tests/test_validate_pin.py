@@ -13,7 +13,7 @@ signals:
   - name: reset_n
     direction: in
     buffer: ibuf
-    pin: A1
+    pins: A1
     bank: 34
     as_bus: true
         """
@@ -28,7 +28,7 @@ signals:
   - name: led0
     direction: out
     buffer: obuf
-    pin: A2
+    pins: A2
     bank: 34
     as_bus: false
         """

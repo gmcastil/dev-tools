@@ -1,0 +1,10 @@
+title: Pinset Array No Width
+part: xc7z020clg400-1
+signals:
+  - name: diffbus
+    direction: in
+    buffer: ibuf
+    pinset:
+      p: [C1, C2]
+      n: [C3, C4]
+banks: {}

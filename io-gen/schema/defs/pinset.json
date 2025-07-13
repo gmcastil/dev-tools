@@ -18,12 +18,14 @@
                 "p": {
                     "type": "array",
                     "items": { "type": "string" },
-                    "minItems": 2
+                    "minItems": 1,
+                    "uniqueItems": true
                 },
                 "n": {
                     "type": "array",
                     "items": { "type": "string" },
-                    "minItems": 2
+                    "minItems": 1,
+                    "uniqueItems": true
                 }
             },
             "required": ["p", "n"],
