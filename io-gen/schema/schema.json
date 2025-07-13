@@ -37,6 +37,7 @@
                 "allOf": [
                     {
                         "if": {
+                            "required": ["generate"],
                             "properties": {
                                 "generate": { "const": false }
                             }

@@ -16,11 +16,11 @@ def load_yaml_file(path):
 	("valid-scalar.yaml", True),
 	("valid-multibank.yaml", True),
 	("valid-pinset-scalar.yaml", True),
+	("valid-scalar-with-width.yaml", True),
 	("invalid-missing-direction.yaml", False),
 	("invalid-pinset-array-no-width.yaml", False),
 	("invalid-unknown-field.yaml", False),
-	("invalid-multibank-no-width.yaml ", False),
-	("invalid-scalar-with-width.yaml", False)
+	("invalid-multibank-no-width.yaml", False)
 ])
 
 def test_schema_validation(filename, should_pass):
