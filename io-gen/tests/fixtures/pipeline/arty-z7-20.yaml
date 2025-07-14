@@ -5,15 +5,15 @@ banks:
 
   13:
     iostandard: LVCMOS33
-    performance: 
+    performance: HR
 
   34:
     iostandard: LVCMOS33
-    performance: 
+    performance: HR
 
   35:
     iostandard: LVCMOS33
-    performance: 
+    performance: HR
 
 signals:
 
@@ -21,6 +21,7 @@ signals:
     pins: H16
     group: clock
     direction: in
+    iostandard: LVCMOS33
     buffer: infer
 
   - name: led
@@ -78,6 +79,7 @@ signals:
   - name: hdmi_rx_cec
     pins: H17
     direction: inout
+    iostandard: LVCMOS33
     buffer: iobuf
 
   - name: hdmi_rx_clk
@@ -85,6 +87,7 @@ signals:
       n: P19
       p: N18
     direction: in
+    iostandard: TMDS_33
     buffer: ibufds
 
   - name: hdmi_rx_data
@@ -93,6 +96,7 @@ signals:
       p: [V20, T20, N20]
     width: 3
     direction: in
+    iostandard: TMDS_33
     buffer: ibufds
 
   # Not sure if this is the right
@@ -101,22 +105,26 @@ signals:
     comment:
       hdl: Hot-plug assert (active high, indicates sink is present)
     direction: out
+    iostandard: LVCMOS33
     buffer: ibuf
 
   - name: hdmi_rx_scl
     pins: U14
     direction: inout
+    iostandard: LVCMOS33
     buffer: iobuf
 
   - name: hdmi_rx_sda
     pins: U15
     direction: inout
+    iostandard: LVCMOS33
     buffer: iobuf
 
   # HDMI TX (source) J11 signals
   - name: hdmi_tx_cec
     pins: G15
     direction: inout
+    iostandard: LVCMOS33
     buffer: iobuf
 
   - name: hdmi_tx_clk
@@ -124,6 +132,7 @@ signals:
       n: L17
       p: L16
     direction: out
+    iostandard: TMDS_33
     buffer: obufds
 
   - name: hdmi_tx_data
@@ -132,21 +141,25 @@ signals:
       p: [K17, K19, J18]
     width: 3
     direction: out
+    iostandard: TMDS_33
     buffer: obufds
 
   - name: hdmi_tx_hpdn
     pins: R19
     direction: in
+    iostandard: LVCMOS33
     buffer: infer
 
   - name: hdmi_tx_scl
     pins: M17
     direction: inout
+    iostandard: LVCMOS33
     buffer: iobuf
 
   - name: hdmi_tx_sda
     pins: M18
     direction: inout
+    iostandard: LVCMOS33
     buffer: iobuf
 
   # Unused or reserved signals
