@@ -3,6 +3,18 @@ part: xc7z020clg400-1
 
 banks:
 
+  13:
+    iostandard: LVCMOS33
+    performance: 
+
+  34:
+    iostandard: LVCMOS33
+    performance: 
+
+  35:
+    iostandard: LVCMOS33
+    performance: 
+
 signals:
 
   - name: ext_clk_125m00
@@ -35,14 +47,14 @@ signals:
   - name: pb_sw
     pins: [D19, D20, L20, L19]
     width: 4
-    group: switches
+    group: switch
     direction: in
     buffer: infer
 
   - name: slide_sw
     pins: [M20, M19]
     width: 2
-    group: switches
+    group: switch
     direction: in
     buffer: infer
 
@@ -73,7 +85,7 @@ signals:
       n: P19
       p: N18
     direction: in
-    buffer:
+    buffer: ibufds
 
   - name: hdmi_rx_data
     pinset:
@@ -81,14 +93,15 @@ signals:
       p: [V20, T20, N20]
     width: 3
     direction: in
-    buffer:
+    buffer: ibufds
 
+  # Not sure if this is the right
   - name: hdmi_rx_hpd
     pins: T19
     comment:
       hdl: Hot-plug assert (active high, indicates sink is present)
-    direction: output
-    buffer:
+    direction: out
+    buffer: ibuf
 
   - name: hdmi_rx_scl
     pins: U14
@@ -121,17 +134,17 @@ signals:
     direction: out
     buffer: obufds
 
-  - name: hdmi_tx_hpdn		
+  - name: hdmi_tx_hpdn
     pins: R19
-    direction: input
+    direction: in
     buffer: infer
 
-  - name: hdmi_tx_scl	    
+  - name: hdmi_tx_scl
     pins: M17
     direction: inout
     buffer: iobuf
 
-  - name: hdmi_tx_sda	    
+  - name: hdmi_tx_sda
     pins: M18
     direction: inout
     buffer: iobuf
@@ -149,6 +162,7 @@ signals:
       n: [Y19, Y17, U19, W19]
       p: [Y18, Y16, U18, W18]
     width: 4
+    group: pmod
     generate: false
 
   - name: pmod_jb
@@ -156,9 +170,11 @@ signals:
       n: [Y14, T10, W16, W13]
       p: [W14, T11, V16, V12]
     width: 4
+    group: pmod
     generate: false
 
   - name: netic20_unused
     pins: [F17, G18, T9, U9]
+    group: unused
     width: 4
     generate: false
