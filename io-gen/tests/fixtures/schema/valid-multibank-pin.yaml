@@ -1,0 +1,15 @@
+title: Scalar Multibank Using pin
+part: xc7z020clg400-1
+signals:
+  - name: scalar_mb
+    direction: out
+    buffer: obuf
+    multibank:
+      - bank: 34
+        pins: A1
+        offset: 0
+      - bank: 35
+        pins: A2
+        offset: 1
+    width: 2
+banks: {}

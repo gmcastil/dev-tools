@@ -1,0 +1,15 @@
+title: Multibank With Extra Fields
+part: xc7z020clg400-1
+signals:
+  - name: messy_mb
+    direction: out
+    buffer: obuf
+    multibank:
+      - bank: 34
+        pins: A1
+        pinset:
+          p: C1
+          n: C2
+        offset: 0
+    width: 1
+banks: {}

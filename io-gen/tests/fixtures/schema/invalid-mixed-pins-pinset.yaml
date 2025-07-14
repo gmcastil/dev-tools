@@ -1,0 +1,11 @@
+title: Mixed Pins and Pinset
+part: xc7z020clg400-1
+signals:
+  - name: bad
+    direction: out
+    buffer: obuf
+    pins: A1
+    pinset:
+      p: C1
+      n: C2
+banks: {}

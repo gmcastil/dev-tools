@@ -1,0 +1,10 @@
+title: Pinset Bus Missing Width
+part: xc7z020clg400-1
+signals:
+  - name: diffbus
+    direction: in
+    buffer: ibuf
+    pinset:
+      p: [A1, A2]
+      n: [B1, B2]
+banks: {}

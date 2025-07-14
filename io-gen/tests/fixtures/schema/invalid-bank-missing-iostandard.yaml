@@ -1,0 +1,10 @@
+title: Bank Missing IOSTANDARD
+part: xc7z020clg400-1
+signals:
+  - name: led
+    direction: out
+    buffer: obuf
+    pins: A1
+banks:
+  "34":
+    performance: HR

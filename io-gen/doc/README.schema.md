@@ -16,13 +16,14 @@ This section documents the structure, rules, and conventions for defining FPGA I
 Each signal must define one of the following structures:
 - `pins`: single-ended
 - `pinset`: differential pair
-- `multibank`: split across multiple banks
+- `multibank`: single-ended or differential pair arrays split across multiple banks
 
 | Field        | Type         | Required?     | Notes                                                              |
 |--------------|--------------|---------------|--------------------------------------------------------------------|
 | `name`       | string       | Always        | Unique signal name                                                 |
 | `direction`  | string       | Usually       | `"in"`, `"out"`, `"inout"` — required unless `generate: false`     |
 | `buffer`     | string       | Usually       | One of `"obuf"`, `"ibuf"`, `"obufds"`, `"ibufds"`                  |
+| 'iostandard' | string       | Conditionally | TBD: Need to describe the overriding ehavior here                  |
 | `generate`   | boolean      | Optional      | Defaults to `true`. If `false`, only `name` is required            |
 | `width`      | integer ≥1   | Conditionally | Required for buses and multibank. Optional for scalars (if present, must equal 1) |
 | `comment`    | object       | Optional      | Optional comment block with `hdl` and/or `xdc` fields              |

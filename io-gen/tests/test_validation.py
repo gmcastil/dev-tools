@@ -20,7 +20,15 @@ def load_yaml_file(path):
 	("invalid-missing-direction.yaml", False),
 	("invalid-pinset-array-no-width.yaml", False),
 	("invalid-unknown-field.yaml", False),
-	("invalid-multibank-no-width.yaml", False)
+	("invalid-multibank-no-width.yaml", False),
+    ("valid-generate-false.yaml", True),
+    ("valid-multibank-pin.yaml", True),
+    ("invalid-mixed-pins-pinset.yaml", False),
+    ("invalid-missing-io-type.yaml", False),
+    ("invalid-pinset-bus-missing-width.yaml", False),
+    ("invalid-multibank-missing-offset.yaml", False),
+    ("invalid-bank-missing-iostandard.yaml", False),
+    ("invalid-multibank-extra-fields.yaml", False)
 ])
 
 def test_schema_validation(filename, should_pass):

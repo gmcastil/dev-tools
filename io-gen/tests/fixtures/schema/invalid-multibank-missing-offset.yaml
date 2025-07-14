@@ -1,0 +1,11 @@
+title: Multibank Missing Offset
+part: xc7z020clg400-1
+signals:
+  - name: bad_mb
+    direction: out
+    buffer: obuf
+    multibank:
+      - bank: 34
+        pins: [A1, A2]
+    width: 2
+banks: {}

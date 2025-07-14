@@ -1,0 +1,7 @@
+title: Missing IO Type
+part: xc7z020clg400-1
+signals:
+  - name: noop
+    direction: in
+    buffer: ibuf
+banks: {}
