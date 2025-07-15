@@ -6,7 +6,6 @@
         "type": "object",
         "properties": {
             "bank": { "$ref": "bank.json" },
-            "pin": { "$ref": "pin.json" },
             "pins": { "$ref": "pins.json" },
             "pinset": { "$ref": "pinset.json" },
             "offset": {
@@ -16,12 +15,11 @@
         },
         "required": ["bank", "offset"],
         "oneOf": [
-            { "required": ["pin"] },
             { "required": ["pins"] },
             { "required": ["pinset"] }
         ],
         "additionalProperties": false
     },
-    "minItems": 2
+    "minItems": 1
 }
 

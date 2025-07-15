@@ -1,20 +1,18 @@
-
 import pytest
 import yaml
-from io_gen.extract import form_signal_entry
+from io_gen.signal_table import form_signal_entry
 
 test_cases = [
     {
         "id": "scalar_pin",
-        "yaml": '''
-            signals:
-              - name: led
-                pins: A1
-                direction: out
-                buffer: infer
-        ''',
+        "yaml": """
+signals:
+  - name: led
+    pins: A1
+    direction: out
+    buffer: infer
+""",
         "expected": {
-            "name": "led",
             "pins": "A1",
             "direction": "out",
             "buffer": "infer",
@@ -27,16 +25,15 @@ test_cases = [
     },
     {
         "id": "bus_pin_array",
-        "yaml": '''
-            signals:
-              - name: data
-                pins: [A1, A2, A3]
-                direction: in
-                buffer: ibuf
-                width: 3
-        ''',
+        "yaml": """
+signals:
+  - name: data
+    pins: [A1, A2, A3]
+    direction: in
+    buffer: ibuf
+    width: 3
+""",
         "expected": {
-            "name": "data",
             "pins": ["A1", "A2", "A3"],
             "direction": "in",
             "buffer": "ibuf",
@@ -49,17 +46,16 @@ test_cases = [
     },
     {
         "id": "scalar_diff_pair",
-        "yaml": '''
-            signals:
-              - name: clk
-                pinset:
-                  p: C1
-                  n: C2
-                direction: in
-                buffer: ibuf
-        ''',
+        "yaml": """
+signals:
+  - name: clk
+    pinset:
+      p: C1
+      n: C2
+    direction: in
+    buffer: ibuf
+""",
         "expected": {
-            "name": "clk",
             "pinset": {"p": "C1", "n": "C2"},
             "direction": "in",
             "buffer": "ibuf",
@@ -72,18 +68,17 @@ test_cases = [
     },
     {
         "id": "diff_pair_array",
-        "yaml": '''
-            signals:
-              - name: diff_bus
-                pinset:
-                  p: [C1, C3]
-                  n: [C2, C4]
-                direction: out
-                buffer: obuf
-                width: 2
-        ''',
+        "yaml": """
+signals:
+  - name: diff_bus
+    pinset:
+      p: [C1, C3]
+      n: [C2, C4]
+    direction: out
+    buffer: obuf
+    width: 2
+""",
         "expected": {
-            "name": "diff_bus",
             "pinset": {"p": ["C1", "C3"], "n": ["C2", "C4"]},
             "direction": "out",
             "buffer": "obuf",
@@ -96,22 +91,21 @@ test_cases = [
     },
     {
         "id": "multibank_pin_array",
-        "yaml": '''
-            signals:
-              - name: ctrl
-                multibank:
-                  - pins: [A1, A2]
-                    bank: 34
-                    offset: 0
-                  - pins: [B1, B2]
-                    bank: 35
-                    offset: 2
-                direction: out
-                buffer: obuf
-                width: 4
-        ''',
+        "yaml": """
+signals:
+  - name: ctrl
+    multibank:
+      - pins: [A1, A2]
+        bank: 34
+        offset: 0
+      - pins: [B1, B2]
+        bank: 35
+        offset: 2
+    direction: out
+    buffer: obuf
+    width: 4
+""",
         "expected": {
-            "name": "ctrl",
             "multibank": [
                 {"pins": ["A1", "A2"], "bank": 34, "offset": 0},
                 {"pins": ["B1", "B2"], "bank": 35, "offset": 2},
@@ -127,26 +121,25 @@ test_cases = [
     },
     {
         "id": "multibank_diff_pair_array",
-        "yaml": '''
-            signals:
-              - name: clk_diff
-                multibank:
-                  - pinset:
-                      p: [C1, C3]
-                      n: [C2, C4]
-                    bank: 34
-                    offset: 0
-                  - pinset:
-                      p: [D1]
-                      n: [D2]
-                    bank: 35
-                    offset: 2
-                direction: in
-                buffer: ibuf
-                width: 3
-        ''',
+        "yaml": """
+signals:
+  - name: clk_diff
+    multibank:
+      - pinset:
+          p: [C1, C3]
+          n: [C2, C4]
+        bank: 34
+        offset: 0
+      - pinset:
+          p: [D1]
+          n: [D2]
+        bank: 35
+        offset: 2
+    direction: in
+    buffer: ibuf
+    width: 3
+""",
         "expected": {
-            "name": "clk_diff",
             "multibank": [
                 {"pinset": {"p": ["C1", "C3"], "n": ["C2", "C4"]}, "bank": 34, "offset": 0},
                 {"pinset": {"p": ["D1"], "n": ["D2"]}, "bank": 35, "offset": 2},
