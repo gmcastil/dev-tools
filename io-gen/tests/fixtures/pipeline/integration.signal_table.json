@@ -1,0 +1,237 @@
+{
+  "sig_inherit": {
+    "direction": "in",
+    "buffer": "ibuf",
+    "group": "",
+    "comment": {},
+    "pins": "P14",
+    "diff_pair": false,
+    "bus": false,
+    "bank": 34,
+    "width": 1
+  },
+  "sig_override": {
+    "direction": "out",
+    "buffer": "obuf",
+    "group": "",
+    "comment": {},
+    "pins": "T15",
+    "iostandard": "LVCMOS25",
+    "diff_pair": false,
+    "bus": false,
+    "width": 1
+  },
+  "bus_34_inherit": {
+    "direction": "in",
+    "buffer": "ibuf",
+    "group": "",
+    "comment": {},
+    "pins": ["P14", "R14", "T14"],
+    "diff_pair": false,
+    "bus": true,
+    "bank": 34,
+    "width": 3
+  },
+  "bus_35_override": {
+    "direction": "out",
+    "buffer": "obuf",
+    "group": "",
+    "comment": {},
+    "pins": ["U12", "V12", "W12"],
+    "iostandard": "LVCMOS25",
+    "diff_pair": false,
+    "bus": true,
+    "width": 3
+  },
+
+  "d_inherit_34": {
+    "direction": "in",
+    "buffer": "ibufds",
+    "group": "",
+    "comment": {},
+    "pinset": {
+      "p": "T13",
+      "n": "R13"
+    },
+    "diff_pair": true,
+    "bus": false,
+    "bank": 34,
+    "width": 1
+  },
+  "d_override_34": {
+    "direction": "out",
+    "buffer": "obufds",
+    "group": "",
+    "comment": {},
+    "pinset": {
+      "p": "W13",
+      "n": "Y13"
+    },
+    "iostandard": "LVCMOS25",
+    "diff_pair": true,
+    "bus": false,
+    "width": 1
+  },
+  "d_inherit_35": {
+    "direction": "in",
+    "buffer": "ibufds",
+    "group": "",
+    "comment": {},
+    "pinset": {
+      "p": "U13",
+      "n": "V13"
+    },
+    "diff_pair": true,
+    "bus": false,
+    "bank": 35,
+    "width": 1
+  },
+  "d_override_35": {
+    "direction": "out",
+    "buffer": "obufds",
+    "group": "",
+    "comment": {},
+    "pinset": {
+      "p": "AA13",
+      "n": "AB13"
+    },
+    "iostandard": "LVCMOS25",
+    "diff_pair": true,
+    "bus": false,
+    "width": 1
+  },
+  "d_array_34": {
+    "direction": "in",
+    "buffer": "ibufds",
+    "group": "",
+    "comment": {},
+    "pinset": {
+      "p": ["K13", "K14", "L13"],
+      "n": ["J13", "J14", "J15"]
+    },
+    "bank": 34,
+    "diff_pair": true,
+    "bus": true,
+    "width": 3
+  },
+  "d_array_override": {
+    "direction": "in",
+    "buffer": "ibufds",
+    "group": "",
+    "comment": {},
+    "pinset": {
+      "p": ["L14", "M13", "M14"],
+      "n": ["K15", "K16", "J16"]
+    },
+    "iostandard": "LVCMOS25",
+    "diff_pair": true,
+    "bus": true,
+    "width": 3
+  },
+  "mb_override": {
+    "direction": "out",
+    "buffer": "obuf",
+    "group": "",
+    "comment": {},
+    "iostandard": "LVCMOS33",
+    "multibank": [
+      {
+        "bank": 34,
+        "offset": 0,
+        "pins": ["A1", "B1"]
+      },
+      {
+        "bank": 35,
+        "offset": 2,
+        "pins": ["C1", "D1"]
+      }
+    ],
+    "diff_pair": false,
+    "bus": true,
+    "width": 4
+  },
+  "mb_inherit_d": {
+    "direction": "in",
+    "buffer": "ibufds",
+    "group": "",
+    "comment": {},
+    "multibank": [
+      {
+        "bank": 34,
+        "offset": 0,
+        "pinset": {
+          "p": ["E1", "F1"],
+          "n": ["E2", "F2"]
+        }
+      },
+      {
+        "bank": 35,
+        "offset": 2,
+        "pinset": {
+          "p": ["G1", "H1"],
+          "n": ["G2", "H2"]
+        }
+      }
+    ],
+    "diff_pair": true,
+    "bus": true,
+    "width": 4
+  },
+  "mb_edge_1": {
+    "direction": "in",
+    "buffer": "ibufds",
+    "group": "",
+    "comment": {},
+    "iostandard": "LVCMOS25",
+    "multibank": [
+      {
+        "bank": 34,
+        "offset": 0,
+        "pinset": {
+          "p": ["A2", "B2", "C2"],
+          "n": ["A3", "B3", "C3"]
+        }
+      },
+      {
+        "bank": 35,
+        "offset": 3,
+        "pinset": {
+          "p": "D2",
+          "n": "D3"
+        }
+      }
+    ],
+    "diff_pair": true,
+    "bus": true,
+    "width": 4
+  },
+
+  "mb_edge_2": {
+    "direction": "out",
+    "buffer": "obufds",
+    "group": "",
+    "comment": {},
+    "iostandard": "LVCMOS25",
+    "multibank": [
+      {
+        "bank": 35,
+        "offset": 0,
+        "pinset": {
+          "p": ["E2"],
+          "n": ["E3"]
+        }
+      },
+      {
+        "bank": 34,
+        "offset": 1,
+        "pinset": {
+          "p": ["F2", "G2", "H2"],
+          "n": ["F3", "G3", "H3"]
+        }
+      }
+    ],
+    "diff_pair": true,
+    "bus": true,
+    "width": 4
+  }
+}

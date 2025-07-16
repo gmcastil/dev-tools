@@ -131,6 +131,37 @@ def is_mixed_multibank(signal: dict[str, Any]) -> bool:
 
     return len(set(fragment_types)) > 1
 
+def check_multibank_width(signal: dict[str, Any]) -> None:
+    """Check that multibank signals define their offsets and widths correctly
+
+    Raises:
+        ValueError: If indices are missing, overlapping, or misaligned with declared width.
+    """
+    assert 'multibank' in signal, f"Signal '{signal['name']}' does not contain 'multibank'"
+
+    width = signal["width"]
+    expected = set(range(width))
+    seen = set()
+
+    for fragment in signal["multibank"]:
+        count = get_multibank_fragment_width(fragment)
+
+        offset = fragment["offset"]
+        indices = set(range(offset, offset + count))
+        overlap = seen & indices
+        if overlap:
+            msg = f"Overlapping multibank indices at offsets {sorted(overlap)}"
+            raise ValueError(msg)
+
+        seen.update(indices)
+
+    if seen != expected:
+        msg = (
+            f"Multibank fragments cover indices {sorted(seen)}, "
+            f"but expected full range 0..{width - 1}"
+        )
+        raise ValueError(msg)
+
 def get_sig_width(signal: dict[str, Any]) -> int:
     """Returns width of a signal"""
 
@@ -166,13 +197,9 @@ def get_sig_width(signal: dict[str, Any]) -> int:
 
         width = len(p_pins)
 
-    elif is_multibank_pins(signal):
+    elif is_multibank_pins(signal) or is_multibank_pinset(signal):
         check_multibank_width(signal)
-        width = sum(len(fragment['pins']) for fragment in signal['multibank'])
-
-    elif is_multibank_pinset(signal):
-        check_multibank_width(signal)
-        width = sum(len(fragment['pinset']['p']) for fragment in signal['multibank'])
+        width = sum(get_multibank_fragment_width(fragment) for fragment in signal['multibank'])
 
     else:
         msg = f"Signal '{signal['name']}' contains unknown pin types"
@@ -187,38 +214,17 @@ def get_sig_width(signal: dict[str, Any]) -> int:
 
     return width
 
-def check_multibank_width(signal: dict[str, Any]) -> None:
-    """Check that multibank signals define their offsets and widths correctly
-
-    Raises:
-        ValueError: If indices are missing, overlapping, or misaligned with declared width.
-    """
-    assert 'multibank' in signal, f"Signal '{signal['name']}' does not contain 'multibank'"
-
-    width = signal["width"]
-    expected = set(range(width))
-    seen = set()
-
-    for fragment in signal["multibank"]:
-        if "pins" in fragment:
-            count = len(fragment["pins"])
-        elif "pinset" in fragment:
-            count = len(fragment["pinset"]["p"])
-        else:
-            raise ValueError("Malformed multibank fragment: missing 'pins' or 'pinset'")
-
-        offset = fragment["offset"]
-        indices = set(range(offset, offset + count))
-        overlap = seen & indices
-        if overlap:
-            msg = f"Overlapping multibank indices at offsets {sorted(overlap)}"
-            raise ValueError(msg)
-
-        seen.update(indices)
-
-    if seen != expected:
-        msg = (
-            f"Multibank fragments cover indices {sorted(seen)}, "
-            f"but expected full range 0..{width - 1}"
-        )
+def get_multibank_fragment_width(fragment: dict) -> int:
+    """Returns the length of a fragment from a multibank signal"""
+    if "pins" in fragment:
+        pins = fragment['pins']
+        count = 1 if isinstance(pins, str) else len(pins)
+    elif "pinset" in fragment:
+        pinset_p = fragment['pinset']['p']
+        count = 1 if isinstance(pinset_p, str) else len(pinset_p)
+    else:
+        msg = f"Malformed multibank fragment: missing 'pins' or 'pinset'"
         raise ValueError(msg)
+
+    return count
+

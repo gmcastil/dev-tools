@@ -21,6 +21,14 @@ TESTS			?= ""
 COVERAGE_ARGS		:= --cov=$(PKG_NAME) --cov-report=term-missing
 TEST_ARGS		:= ""
 
+help:
+	@$(PRINTF) '%s\n' "Available targets:"
+	@$(PRINTF) '%-16s %s\n' "  help" "This help menu"
+	@$(PRINTF) '%-16s %s\n' "  test" "Run entire test suite"
+	@$(PRINTF) '%-16s %s\n' "  debug" "Run entire test suite, with PDB and output directed to console"
+	@$(PRINTF) '%-16s %s\n' "  coverage" "Run tests with coverage"
+	@$(PRINTF) '%-16s %s\n' "  check-ascii" "Search the source tree for non-ASCII characters"
+
 $(VENV_INSTALLED_STAMP): requirements.txt
 	@$(PRINTF) '%s\n' "Initializing virtual environment"
 	python3 -m venv $(VENV)

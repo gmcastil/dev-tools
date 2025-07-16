@@ -11,11 +11,13 @@ signals:
     pins: A1
     direction: out
     buffer: infer
+    bank: 34
 """,
         "expected": {
             "pins": "A1",
             "direction": "out",
             "buffer": "infer",
+            "bank": 34,
             "group": "",
             "comment": {},
             "width": 1,
@@ -54,11 +56,13 @@ signals:
       n: C2
     direction: in
     buffer: ibuf
+    iostandard: LVCMOS33
 """,
         "expected": {
             "pinset": {"p": "C1", "n": "C2"},
             "direction": "in",
             "buffer": "ibuf",
+            "iostandard": "LVCMOS33",
             "group": "",
             "comment": {},
             "width": 1,
@@ -76,12 +80,14 @@ signals:
       n: [C2, C4]
     direction: out
     buffer: obuf
+    iostandard: LVCMOS25
     width: 2
 """,
         "expected": {
             "pinset": {"p": ["C1", "C3"], "n": ["C2", "C4"]},
             "direction": "out",
             "buffer": "obuf",
+            "iostandard": "LVCMOS25",
             "group": "",
             "comment": {},
             "width": 2,

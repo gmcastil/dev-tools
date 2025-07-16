@@ -6,8 +6,8 @@ from io_gen.signal_table import extract_signal_table
 
 from jsonschema.exceptions import ValidationError
 
-FIXTURE_YAML = Path("tests/fixtures/pipeline/arty-z7-20.yaml")
-FIXTURE_SIG_TABLE = Path("tests/fixtures/pipeline/arty-z7-20.signal_table.json")
+FIXTURE_YAML = Path("tests/fixtures/pipeline/integration.yaml")
+FIXTURE_SIG_TABLE = Path("tests/fixtures/pipeline/integration.signal_table.json")
 
 def test_pipeline():
     # Load YAML

@@ -1,0 +1,154 @@
+title: minimal bank inheritance test
+part: xc7z020clg400-1
+
+banks:
+  34:
+    iostandard: LVCMOS18
+    performance: HP
+  35:
+    iostandard: LVCMOS33
+    performance: HP
+
+signals:
+  - name: sig_inherit
+    direction: in
+    buffer: ibuf
+    pins: P14
+    bank: 34
+    # Inherits IOSTANDARD from bank 34 (e.g. if P14 is in bank 34)
+
+  - name: sig_override
+    direction: out
+    buffer: obuf
+    pins: T15
+    iostandard: LVCMOS25  # Overrides bank default
+
+  - name: bus_34_inherit
+    direction: in
+    buffer: ibuf
+    pins: [P14, R14, T14]
+    width: 3
+    bank: 34
+    # Inherits IOSTANDARD from bank 34
+
+  - name: bus_35_override
+    direction: out
+    buffer: obuf
+    pins: [U12, V12, W12]
+    width: 3
+    iostandard: LVCMOS25  # Overrides bank default
+
+  - name: d_inherit_34
+    direction: in
+    buffer: ibufds
+    pinset:
+      p: T13
+      n: R13
+    bank: 34
+    # Inherits IOSTANDARD from bank 34
+
+  - name: d_override_34
+    direction: out
+    buffer: obufds
+    pinset:
+      p: W13
+      n: Y13
+    iostandard: LVCMOS25
+
+  - name: d_inherit_35
+    direction: in
+    buffer: ibufds
+    pinset:
+      p: U13
+      n: V13
+    bank: 35
+    # Inherits IOSTANDARD from bank 35
+
+  - name: d_override_35
+    direction: out
+    buffer: obufds
+    pinset:
+      p: AA13
+      n: AB13
+    iostandard: LVCMOS25
+
+  - name: d_array_34
+    direction: in
+    buffer: ibufds
+    width: 3
+    pinset:
+      p: [K13, K14, L13]
+      n: [J13, J14, J15]
+    bank: 34
+
+  - name: d_array_override
+    direction: in
+    buffer: ibufds
+    width: 3
+    pinset:
+      p: [L14, M13, M14]
+      n: [K15, K16, J16]
+    iostandard: LVCMOS25
+
+  - name: mb_override
+    direction: out
+    buffer: obuf
+    width: 4
+    iostandard: LVCMOS33
+    multibank:
+      - bank: 34
+        offset: 0
+        pins: [A1, B1]
+      - bank: 35
+        offset: 2
+        pins: [C1, D1]
+
+  - name: mb_inherit_d
+    direction: in
+    buffer: ibufds
+    width: 4
+    multibank:
+      - bank: 34
+        offset: 0
+        pinset:
+          p: [E1, F1]
+          n: [E2, F2]
+      - bank: 35
+        offset: 2
+        pinset:
+          p: [G1, H1]
+          n: [G2, H2]
+
+  - name: mb_edge_1
+    direction: in
+    buffer: ibufds
+    width: 4
+    iostandard: LVCMOS25
+    multibank:
+      - bank: 34
+        offset: 0
+        pinset:
+          p: [A2, B2, C2]
+          n: [A3, B3, C3]
+      - bank: 35
+        offset: 3
+        pinset:
+          p: D2
+          n: D3
+
+  - name: mb_edge_2
+    direction: out
+    buffer: obufds
+    width: 4
+    iostandard: LVCMOS25
+    multibank:
+      - bank: 35
+        offset: 0
+        pinset:
+          p: [E2]
+          n: [E3]
+      - bank: 34
+        offset: 1
+        pinset:
+          p: [F2, G2, H2]
+          n: [F3, G3, H3]
