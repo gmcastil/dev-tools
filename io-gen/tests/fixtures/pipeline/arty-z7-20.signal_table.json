@@ -1,0 +1,258 @@
+{
+  "ext_clk_125m00": {
+    "direction": "in",
+    "buffer": "infer",
+    "group": "clock",
+    "comment": {},
+    "pins": "H16",
+    "diff_pair": false,
+    "bus": false,
+    "width": 1
+  },
+  "led": {
+    "direction": "out",
+    "buffer": "infer",
+    "group": "led",
+    "comment": {},
+    "pins": [
+      "R14",
+      "P14",
+      "N16",
+      "M14"
+    ],
+    "diff_pair": false,
+    "bus": true,
+    "width": 4
+  },
+  "led4": {
+    "direction": "out",
+    "buffer": "infer",
+    "group": "led",
+    "comment": {},
+    "pins": [
+      "N15",
+      "G17",
+      "L15"
+    ],
+    "diff_pair": false,
+    "bus": true,
+    "width": 3
+  },
+  "led5": {
+    "direction": "out",
+    "buffer": "infer",
+    "group": "led",
+    "comment": {},
+    "pins": [
+      "M15",
+      "L14",
+      "G14"
+    ],
+    "diff_pair": false,
+    "bus": true,
+    "width": 3
+  },
+  "pb_sw": {
+    "direction": "in",
+    "buffer": "infer",
+    "group": "switch",
+    "comment": {},
+    "pins": [
+      "D19",
+      "D20",
+      "L20",
+      "L19"
+    ],
+    "diff_pair": false,
+    "bus": true,
+    "width": 4
+  },
+  "slide_sw": {
+    "direction": "in",
+    "buffer": "infer",
+    "group": "switch",
+    "comment": {},
+    "pins": [
+      "M20",
+      "M19"
+    ],
+    "diff_pair": false,
+    "bus": true,
+    "width": 2
+  },
+  "aud_pwm": {
+    "direction": "out",
+    "buffer": "infer",
+    "group": "",
+    "comment": {
+      "hdl": "PWM mono audio output to low-pass filter",
+      "xdc": "PWM mono audio output (J13)"
+    },
+    "pins": "R18",
+    "diff_pair": false,
+    "bus": false,
+    "width": 1
+  },
+  "aud_sd": {
+    "direction": "out",
+    "buffer": "infer",
+    "group": "",
+    "comment": {
+      "hdl": "Audio shutdown control - drive high to enable audio output"
+    },
+    "pins": "T17",
+    "diff_pair": false,
+    "bus": false,
+    "width": 1
+  },
+  "hdmi_rx_cec": {
+    "direction": "inout",
+    "buffer": "iobuf",
+    "group": "",
+    "comment": {},
+    "pins": "H17",
+    "diff_pair": false,
+    "bus": false,
+    "width": 1
+  },
+  "hdmi_rx_clk": {
+    "direction": "in",
+    "buffer": "ibufds",
+    "group": "",
+    "comment": {},
+    "pinset": {
+      "n": "P19",
+      "p": "N18"
+    },
+    "diff_pair": true,
+    "bus": false,
+    "width": 1
+  },
+  "hdmi_rx_data": {
+    "direction": "in",
+    "buffer": "ibufds",
+    "group": "",
+    "comment": {},
+    "pinset": {
+      "n": [
+        "W20",
+        "U20",
+        "P20"
+      ],
+      "p": [
+        "V20",
+        "T20",
+        "N20"
+      ]
+    },
+    "diff_pair": true,
+    "bus": true,
+    "width": 3
+  },
+  "hdmi_rx_hpd": {
+    "direction": "out",
+    "buffer": "ibuf",
+    "group": "",
+    "comment": {
+      "hdl": "Hot-plug assert (active high, indicates sink is present)"
+    },
+    "pins": "T19",
+    "diff_pair": false,
+    "bus": false,
+    "width": 1
+  },
+  "hdmi_rx_scl": {
+    "direction": "inout",
+    "buffer": "iobuf",
+    "group": "",
+    "comment": {},
+    "pins": "U14",
+    "diff_pair": false,
+    "bus": false,
+    "width": 1
+  },
+  "hdmi_rx_sda": {
+    "direction": "inout",
+    "buffer": "iobuf",
+    "group": "",
+    "comment": {},
+    "pins": "U15",
+    "diff_pair": false,
+    "bus": false,
+    "width": 1
+  },
+  "hdmi_tx_cec": {
+    "direction": "inout",
+    "buffer": "iobuf",
+    "group": "",
+    "comment": {},
+    "pins": "G15",
+    "diff_pair": false,
+    "bus": false,
+    "width": 1
+  },
+  "hdmi_tx_clk": {
+    "direction": "out",
+    "buffer": "obufds",
+    "group": "",
+    "comment": {},
+    "pinset": {
+      "n": "L17",
+      "p": "L16"
+    },
+    "diff_pair": true,
+    "bus": false,
+    "width": 1
+  },
+  "hdmi_tx_data": {
+    "direction": "out",
+    "buffer": "obufds",
+    "group": "",
+    "comment": {},
+    "pinset": {
+      "n": [
+        "K18",
+        "J19",
+        "H18"
+      ],
+      "p": [
+        "K17",
+        "K19",
+        "J18"
+      ]
+    },
+    "diff_pair": true,
+    "bus": true,
+    "width": 3
+  },
+  "hdmi_tx_hpdn": {
+    "direction": "in",
+    "buffer": "infer",
+    "group": "",
+    "comment": {},
+    "pins": "R19",
+    "diff_pair": false,
+    "bus": false,
+    "width": 1
+  },
+  "hdmi_tx_scl": {
+    "direction": "inout",
+    "buffer": "iobuf",
+    "group": "",
+    "comment": {},
+    "pins": "M17",
+    "diff_pair": false,
+    "bus": false,
+    "width": 1
+  },
+  "hdmi_tx_sda": {
+    "direction": "inout",
+    "buffer": "iobuf",
+    "group": "",
+    "comment": {},
+    "pins": "M18",
+    "diff_pair": false,
+    "bus": false,
+    "width": 1
+  }
+}

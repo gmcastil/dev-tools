@@ -1,8 +1,9 @@
+from typing import Any
+from copy import copy, deepcopy
+
 from io_gen.utils import *
 
-from typing import Dict, Any, List
-
-def extract_signal_table(signals: List[Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
+def extract_signal_table(signals: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
     """Convert list of signal definitions into a signal table keyed by name.
 
     This function builds a per-signal metadata table (width, group, comment, etc.)
@@ -23,52 +24,73 @@ def extract_signal_table(signals: List[Dict[str, Any]]) -> Dict[str, Dict[str, A
     sig_table = {}
 
     for sig in signals:
-        # First, check for duplciate signal names
-        if sig['name'] in sig_table:
-            msg = f"Duplicate signal name {sig['name']}"
-            raise ValueError(msg)
-        else:
-            # Signal names are the keys to the signal table
-            name = sig['name']
 
-        entry = {}
+        # Skip omitted signals
+        if not sig.get('generate', True):
+            continue
 
-        # Comment and group for signals are optional
-        entry = {
-                'group' : sig.get('group', ''),
-                'comment' : sig.get('comment', '')
-                }
+        # Ensure generate is set explicitly
+        sig['generate'] = True
 
-        # The 'as_bus' property needs some careful handling
-        if is_pins_scalar(sig) or is_pinset_scalar(sig):
-            entry['as_bus'] = sig.get('as_bus', False)
-        else:
-            entry['as_bus'] = False
+        # Check for duplciate signal names
+        name = sig['name']
 
-        # Width is optional for some pin types, which makes it annoying
-        # to set properly
-        if is_pins_scalar(sig) or is_pinset_scalar(sig):
-            entry['width'] = sig.get('width', 1)
-
-        # Width is required for pins, pinset arrays and multibank
-        elif is_pins_array(sig) or is_pinset_array(sig) or is_multibank(sig):
-            if 'width' in sig:
-                entry['width'] = sig['width']
-            else:
-                msg = f"Signal '{name}' does not have a width property set."
-                raise ValueError(msg)
-
-        # Somehow, an unknown signal made its way in here
-        # Schena should prevent this from happening
-        else:
-            msg = f"Signal '{name}' does not a have a pin type"
+        if name in sig_table:
+            msg = f"Duplicate signal name '{name}'"
             raise ValueError(msg)
 
-        sig_table[name] = entry
+        sig_table[name] = form_signal_entry(sig)
 
     return sig_table
 
-def validate_signal_table(signal_table: Dict[str, Dict[str, Any]]) -> None:
+def form_signal_entry(signal: dict[str, Any]) -> dict[str, Any]:
+    """Creates a signal table entry from a YAML entry"""
+
+    # These fields are required by the schema
+    entry = {
+        'direction' : signal['direction'],
+        'buffer' : signal['buffer']
+    }
+
+    # Comment and group for signals are optional
+    entry['group'] = signal.get('group', "")
+    # Signals contain structured comments so just leave this empty if none provided
+    entry['comment'] = signal.get('comment', {})
+    
+    # Determine pin type
+    if is_scalar_pins(signal):
+        entry['pins'] = deepcopy(signal['pins'])
+        entry['diff_pair'] = False
+        entry['bus'] = False
+    elif is_scalar_pinset(signal):
+        entry['pinset'] = deepcopy(signal['pinset'])
+        entry['diff_pair'] = True
+        entry['bus'] = False
+    elif is_array_pins(signal):
+        entry['pins'] = deepcopy(signal['pins'])
+        entry['diff_pair'] = False
+        entry['bus'] = True
+    elif is_array_pinset(signal):
+        entry['pinset'] = deepcopy(signal['pinset'])
+        entry['diff_pair'] = True
+        entry['bus'] = True
+    elif is_multibank_pins(signal):
+        entry['multibank'] = deepcopy(signal['multibank'])
+        entry['diff_pair'] = False
+        entry['bus'] = True
+    elif is_multibank_pinset(signal):
+        entry['multibank'] = deepcopy(signal['multibank'])
+        entry['diff_pair'] = True
+        entry['bus'] = True
+    else:
+        msg = f"Signal '{signal['name']}' has missing or malformed pin definition"
+        raise ValueError(msg)
+
+    entry['width'] = get_sig_width(signal)
+
+    return entry
+
+def validate_signal_table(signal_table: dict[str, dict[str, Any]]) -> None:
     """
     Validate the signal table for internal consistency.
 
