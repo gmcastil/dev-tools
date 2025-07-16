@@ -40,7 +40,7 @@ def is_scalar_pinset(signal: dict[str, Any]) -> bool:
         )
         raise ValueError(msg)
 
-def is_array_pins(signal: dict) -> bool:
+def is_array_pins(signal: dict[str, Any]) -> bool:
     """Returns true if signal from YAML is an array of single-ended pins"""
     if 'pins' not in signal:
         return False

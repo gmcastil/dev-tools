@@ -1,23 +1,21 @@
-from copy import deepcopy
 from typing import Any
 
-from io_gen.utils import *
+from utils import is_scalar_pins, is_array_pins
+from utils import is_scalar_pinset, is_array_pinset
+from utils import is_multibank_pins, is_multibank_pinset
 
 def extract_pin_table(
-    signals: list[dict[str, Any]],
     signal_table: dict[str, dict[str, Any]],
     bank_table: dict[int, dict[str, Any]]
 ) -> list[dict[str, Any]]:
-    """Flatten pins into atomic entries, grouped per signal.
+    """Flatten signals into atomic pin entries
 
-    This function transforms all signal fragments into a flat list of atomic
-    pins or differential pairs. It combines information from signals,
-    the signal table, and the bank table.
+    This function transforms all signal definitions into a flat list of atomic
+    pins or differential pairs.
 
     Args:
-        signals: Raw signal list from YAML.
-        signal_table: The extracted per-signal metadata table.
-        bank_table: The extracted per-bank metadata table.
+        signal_table: The extracted per-signal metadata table, with keys as signal names
+        bank_table: The extracted per-bank metadata table, with keys as bank numbers
 
     Returns:
         A list of dicts, one per atomic pin or pin pair, each with full metadata.
@@ -25,199 +23,165 @@ def extract_pin_table(
     """
     pin_table = []
 
-    for sig in signals:
+    for sig_name in signal_table:
+        signal = signal_table[sig_name]
 
-        sig_name = sig['name']
-        if is_pins_scalar(sig):
-            flattened_pins = flatten_signal_pins_scalar(sig, bank_table)
-        elif is_pins_array(sig):
-            flattened_pins = flatten_signal_pins_array(sig, bank_table)
-        elif is_pinset_scalar(sig):
-            flattened_pins = flatten_signal_pinset_scalar(sig, bank_table)
-        elif is_pinset_array(sig):
-            flattened_pins = flatten_signal_pinset_array(sig, bank_table)
-        elif is_multibank(sig):
-            flattened_pins = flatten_signal_multibank(sig, bank_table)
+        if is_scalar_pins(signal):
+            pin_entries = flatten_scalar_pins(signal, bank_table)
+        elif is_array_pins(signal):
+            pin_entries = flatten_array_pins(signal, bank_table)
+        elif is_scalar_pinset(signal):
+            pin_entries = flatten_scalar_pinset(signal, bank_table)
+        elif is_array_pinset(signal):
+            pin_entries = flatten_array_pinset(signal, bank_table)
+        elif is_multibank_pins(signal):
+            pin_entries = flatten_multibank_pins(signal, bank_table)
+        elif is_multibank_pinset(signal):
+            pin_entries = flatten_multibank_pinset(signal, bank_table)
         else:
-            msg = f"Signal '{sig_name}' has no valid pin definition"
+            msg = f"Signal '{signal['name']}' has unknown pin type"
             raise ValueError(msg)
 
-        # Width is a signal property stored in the signal table, but the
-        # number of pins isn't known until after flattening. So look up
-        # the width in the signal table and compare it to what we got
-        # after flattening
-        sig_width_from_table = signal_table[sig_name]['width']
-        sig_width = len(flattened_pins)
-        if sig_width != sig_width_from_table:
-            msg = (
-                f"Signal '{sig_name}' flattened into {sig_width} entries, "
-                f"but signal width was defined as {sig_width_from_table}"
-                )
-            raise ValueError(msg)
+        pin_table.extend(pin_entries)
 
-        # Flattened pins have the correct width so we grow the pin table
-        pin_table.extend(flattened_pins)
-    
     return pin_table
 
-def validate_pin_table(pin_table: dict[str, list[dict[str, Any]]]) -> None:
-    """
-    Validate the flattened pin table for correctness.
+def flatten_scalar_pins(signal: dict[str, Any], bank_table: dict[int, dict[str, Any]]) -> list[dict[str, Any]]:
+    """Flattens a signal into a list of pins"""
 
-    This includes checks like:
-    - Unique (name, index) per signal
-    - No reuse of package pins
-    - Required metadata fields present
+    entry = get_pin_table_entry(signal, bank_table)
+    entry['index'] = 0
+    entry['pin'] = signal['pins']
+    pin_table_entries = [entry]
+
+    check_flattened_width(signal, pin_table_entries)
+
+    return pin_table_entries
+
+def flatten_array_pins(signal: dict[str, Any], bank_table: dict[int, dict[str, Any]]) -> list[dict[str, Any]]:
+    """Flattens a signal into a list of pins"""
+
+    pin_table_entries = []
+    for index, pin in enumerate(signal['pins']):
+        entry = get_pin_table_entry(signal, bank_table)
+        entry['index'] = index
+        entry['pin'] = pin
+        pin_table_entries.append(entry)
+    check_flattened_width(signal, pin_table_entries)
+
+    return pin_table_entries
+
+def flatten_scalar_pinset(signal: dict[str, Any], bank_table: dict[int, dict[str, Any]]) -> list[dict[str, Any]]:
+    """Flattens a signal into a list of pin pairs"""
+    assert signal['diff_pair'], f"Signal '{signal['name']}' is not a differential pair"
+
+    entry = get_pin_table_entry(signal, bank_table)
+    entry['index'] = 0
+    entry['p'] = signal['p']
+    entry['n'] = signal['n']
+    pin_table_entries = [entry]
+
+    check_flattened_width(signal, pin_table_entries)
+
+    return pin_table_entries
+
+def flatten_array_pinset(signal: dict[str, Any], bank_table: dict[int, dict[str, Any]]) -> list[dict[str, Any]]:
+    """Flattens a signal into a list of pin pairs"""
+    assert signal['diff_pair'], f"Signal '{signal['name']}' is not a differential pair"
+
+    pin_table_entries = []
+    for index, (pin_p, pin_n) in enumerate(zip(signal["pinset"]["p"], signal["pinset"]["n"])):
+        entry = get_pin_table_entry(signal, bank_table)
+        entry['index'] = index
+        entry['p'] = pin_p
+        entry['n'] = pin_n
+        pin_table_entries.append(entry)
+
+    check_flattened_width(signal, pin_table_entries)
+
+    return pin_table_entries
+
+def flatten_multibank_pins(signal: dict[str, Any], bank_table: dict[int, dict[str, Any]]) -> list[dict[str, Any]]:
+    assert 'multibank' in signal, f"Signal '{signal['name']}' is not a multibank signal"
+
+def flatten_multibank_pinset(signal: dict[str, Any], bank_table: dict[int, dict[str, Any]]) -> list[dict[str, Any]]:
+    assert 'multibank' in signal, f"Signal '{signal['name']}' is not a multibank signal"
+
+def get_pin_table_entry(signal: dict[str, Any], bank_table dict[int, dict[str, Any]]) -> dict[str, Any]:
+    """Returns a minimal pin table entry with name, direction, buffer, and iostandard
 
     Args:
-        pin_table: The flat list of pins/pairs extracted from signals.
+        signal - Entry from the signal table to use as a starting point for a pin table entry
+        bank_table - Bank table
 
-    Raises:
-        ValueError: If the pin table violates structural or uniqueness constraints.
+    Returns:
+        dict
 
     """
-    pass
+    # Every entry in the pin table will get these values directly fro the signal its a part of
+    entry = {
+        'name' : signal['name'],
+        'direction' : signal['direction'],
+        'buffer' : signal['buffer'],
+        'diff_pair' : signal['diff_pair'],
+        'bus' : signal['bus']
+    }
 
-def make_pin_table_entry_stub(signal: dict, banks: dict[int, dict]) -> dict[str, Any]:
-    # All pin entries share these
-    pin_entry_stub = {
-            'name' : signal['name'],
-            'direction' : signal['direction'],
-            'buffer' : signal['buffer']
-            }
-    # Now set the iostandard, which may or may not be inherited from the bank
-    if "iostandard" not in signal:
-        bank = signal.get("bank", None)
-        if bank is not None and bank in banks:
-            pin_entry_stub['iostandard'] = banks[bank]['iostandard']
-        else:
-            msg = f"Signal '{signal['name']}' has no bank or IOSTANDARD defined"
-            raise ValueError(msg)
+    # The iostandard is a bit more sophisticated, so resolve that separately
+    entry['iostandard'] = resolve_iostandard(signal, bank_table)
+
+    return entry
+
+def resolve_iostandard(signal: dict[str, Any], bank_table: dict[int, dict[str, Any]]) -> str:
+    """Resolves the iostandard for a signal via inheritance or direct specification"""
+
+    # The iostandard is specified directly (but checked if a bank was supplied)
+    if 'iostandard' in signal:
+        sig_iostandard = signal['iostandard']
+
+        if 'bank' in signal:
+            bank_iostandard = get_bank_iostandard(signal['bank'], bank_table)
+            if bank_iostandard != sig_iostandard:
+                msg = (
+                    f"Signal '{signal['name']}' specifies IOSTANDARD '{sig_iostandard}' but bank {signal['bank']} declares "
+                    f"'{bank_iostandard}' — values must match. Either remove the signal-level IOSTANDARD to "
+                    f"inherit from the bank, or update one to resolve the conflict."
+                    )
+                raise ValueError(msg)
+    # The iostandard is inherited
+    elif 'bank' in signal:
+        sig_iostandard = get_bank_iostandard(signal['bank'], bank_table)
+    # Cannot resolve the iostandard
     else:
-        pin_entry_stub['iostandard'] = signal['iostandard']
-
-    return pin_entry_stub
-
-def flatten_signal_pins_scalar(signal: dict, banks: dict[int, dict]) -> list[dict]:
-    """Flatten a single-ended scalar signal into one pin entry."""
-    if not is_pins_scalar(signal):
-        msg = f"Signal '{signal['name']}' is not a scalar pin"
+        msg = f"Signal '{signal['name']}' does not contain an 'iostandard' or 'bank' property"
         raise ValueError(msg)
 
-    pin_table_entry = make_pin_table_entry_stub(signal, banks)
-    pin_table_entry['pin'] = signal['pins']
-    pin_table_entry['index'] = 0
+    return sig_iostandard
 
-    return [pin_table_entry]
+def get_bank_iostandard(number: int, bank_table: dict[int, dict[str, Any]]) -> str:
+    """Looks up the IOSTANDARD property for a bank from the bank table"""
 
-def flatten_signal_pins_array(signal: dict, banks: dict[int, dict]) -> list[dict]:
-    """Flatten a single-ended array signal into multiple indexed pin entries."""
-    if not is_pins_array(signal):
-        msg = f"Signal '{signal['name']}' is not an array of pins"
+    if number not in bank_table:
+        msg = f"Bank table does not contain an entry for bank {number}"
         raise ValueError(msg)
 
-    result = []
-    for index, pin in enumerate(signal['pins']):
-        pin_table_entry = make_pin_table_entry_stub(signal, banks)
-        pin_table_entry['pin'] = pin
-        pin_table_entry['index']  = index
-        result.append(pin_table_entry)
+    # The bank 'iostandard' key is required by the schema
+    assert 'iostandard' in bank_table[number], "Bank 'iostandard' is missing from bank table entry"
 
-    return result
+    iostandard = bank_table[number]['iostandard']
+    return iostandard
 
-def flatten_signal_pinset_scalar(signal: dict, banks: dict[int, dict]) -> list[dict]:
-    """Flatten a differential scalar signal into one pinset entry."""
-    if not is_pinset_scalar(signal):
-        msg = f"Signal '{signal['name']}' is not a scalar pinset"
-        raise ValueError(msg)
+def check_flattened_width(signal: dict[str, Any], pin_entries: list[dict[str, Any]]) -> None:
+    """Checks that flattened pin entries have the appropriate width and range"""
 
-    pin_table_entry = make_pin_table_entry_stub(signal, banks)
-    pin_table_entry['p'] = signal['pinset']['p']
-    pin_table_entry['n'] = signal['pinset']['n']
-    pin_table_entry['index'] = 0
+    actual_indices = sorted(entry['index'] for entry in pin_entries)
+    expected_indices = list(range(0, signal['width']))
 
-    return [pin_table_entry]
-
-def flatten_signal_pinset_array(signal: dict, banks: dict[int, dict]) -> list[dict]:
-    """Flatten a differential array signal into multiple indexed pinset entries."""
-    if not is_pinset_array(signal):
-        msg = f"Signal '{signal['name']}' is not an array of pinset"
-        raise ValueError(msg)
-
-    result = []
-    # We don't generally check width here, but we're going to zip these together,
-    # which will truncate the trailing values without throwing an exception (3.10+
-    # supports a strict mode for zip() but we're not using that). So check the length
-    # here and later, we'll check the width like everywhere else.
-    p_pins = signal['pinset']['p']
-    n_pins = signal['pinset']['n']
-    if len(p_pins) != len(n_pins):
+    if actual_indices != expected_indices:
         msg = (
-            f"Signal '{signal['name']}' has mismatched pinset lengths: "
-            f"{len(p_pins)} != {len(n_pins)}"
-            )
+                f"Signal '{signal['name']}' has index or width mismatch: "
+                f"expected {expected_indices}, but got {actual_indices}"
+                )
         raise ValueError(msg)
-
-    for index, (p_pin, n_pin) in enumerate(zip(p_pins, n_pins)):
-        pin_table_entry = make_pin_table_entry_stub(signal, banks)
-        pin_table_entry['p'] = p_pin
-        pin_table_entry['n'] = n_pin
-        pin_table_entry['index']  = index
-        result.append(pin_table_entry)
-
-    return result
-
-def flatten_signal_multibank(signal: dict, banks: dict[int, dict]) -> list[dict]:
-    """Flatten a multibank signal into indexed pin entries across banks."""
-
-    if not is_multibank(signal) or is_mixed_multibank(signal):
-        msg = f"Signal '{signal['name']}' is not a multibank or contains mixed pin types"
-        raise ValueError(msg)
-
-    # Expressly disallowing the forced single bit bus from multibank buses - these
-    # are inherently multi-bit
-    if signal.get('as_bus', False):
-        msg = f"Signal '{signal['name']}' is multibit and does not support 'as_bus'"
-        raise ValueError(msg)
-
-    # Copy this first because we're going to mutate the fragment and turn it into
-    # something that resembles a signal
-    signal_c = deepcopy(signal)
-    result = []
-    # Have to keep track of the starting position of each segment - this requires
-    # that the banks appear in ascending order of pins
-    offset = 0
-
-    for fragment in signal_c['multibank']:
-        # To leverage the existing flatten functions, we need to make signal
-        # fragments look like signals - this means adding the signal direction
-        # buffer type, name, and iostandard (if provided) to the fragment. Each
-        # fragment contains the pin or pinset, bank number
-        fragment['name'] = signal_c['name']
-        fragment['direction'] = signal_c['direction']
-        fragment['buffer'] = signal_c['buffer']
-        # This can be inherited per-bank but only declared for the top level signal
-        if 'iostandard' in signal_c:
-            fragment['iostandard'] = signal_c['iostandard']
-
-        if is_pins_scalar(fragment):
-            flattened = flatten_signal_pins_scalar(fragment, banks)
-        elif is_pins_array(fragment):
-            flattened = flatten_signal_pins_array(fragment, banks)
-        elif is_pinset_scalar(fragment):
-            flattened = flatten_signal_pinset_scalar(fragment, banks)
-        elif is_pinset_array(fragment):
-            flattened = flatten_signal_pinset_array(fragment, banks)
-        else:
-            msg = f"Signal '{signal_c['name]']}' has an unknown pin type"
-            raise ValueError(msg)
-
-        # Set the index for each elmement of each frragment
-        for index, pin in enumerate(flattened, start=offset):
-            pin['index'] = index
-        offset += len(flattened)
-
-        result.extend(flattened)
-
-    return result
+    
 
