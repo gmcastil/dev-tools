@@ -1,10 +1,7 @@
 from typing import Dict, Any
 
-# These should get pulled from JSON
+# TODO: These should get pulled from JSON
 ENUM_BANK_PERFORMANCE = {"HP", "HR", "HD"}
-
-def extract_bank_table(banks: Dict[str, Dict[str, Any]]) -> Dict[int, Dict[str, Any]]:
-    """Convert string-keyed YAML bank dict to int-keyed bank table with validated entries."""
 
 def extract_bank_table(banks: Dict[int, Dict[str, Any]]) -> Dict[int, Dict[str, Any]]:
     """
