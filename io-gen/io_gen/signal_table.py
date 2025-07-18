@@ -3,7 +3,7 @@ from copy import copy, deepcopy
 
 from io_gen.utils import *
 
-def extract_signal_table(signals: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+def extract_signal_table(signals: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Convert list of signal definitions into a signal table keyed by name.
 
     This function builds a per-signal metadata table (width, group, comment, etc.)
@@ -14,14 +14,14 @@ def extract_signal_table(signals: list[dict[str, Any]]) -> dict[str, dict[str, A
         signals: List of signal definitions from the YAML input.
 
     Returns:
-        A dictionary keyed by signal name, where each value contains
-        signal-level metadata.
+        list of dict
 
     Raises:
         ValueError - If duplicate signal names are present in the input data
 
     """
-    sig_table = {}
+    sig_table = []
+    sig_names = set()
 
     for sig in signals:
 
@@ -31,13 +31,15 @@ def extract_signal_table(signals: list[dict[str, Any]]) -> dict[str, dict[str, A
 
         # Check for duplciate signal names
         name = sig['name']
-        if name in sig_table:
+        if name in sig_names:
             msg = f"Duplicate signal name '{name}'"
             raise ValueError(msg)
+        else:
+            sig_names.add(name)
 
         # No reason to keep dragging these generate = true keys around everywhere
         sig.pop('generate', None)
-        sig_table[name] = form_signal_entry(sig)
+        sig_table.append(form_signal_entry(sig))
 
     return sig_table
 
@@ -47,6 +49,7 @@ def form_signal_entry(signal: dict[str, Any]) -> dict[str, Any]:
     # These fields are required by the schema (for signals that will be
     # added to the table)
     entry = {
+        'name' : signal['name'],
         'direction' : signal['direction'],
         'buffer' : signal['buffer']
     }

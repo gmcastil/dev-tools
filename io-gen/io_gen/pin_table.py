@@ -48,6 +48,7 @@ def extract_pin_table(
 
 def flatten_scalar_pins(signal: dict[str, Any], bank_table: dict[int, dict[str, Any]]) -> list[dict[str, Any]]:
     """Flattens a signal into a list of pins"""
+    assert 'pins' in signal, f"Signal '{signal['name']}' is not a single-ended signal"
 
     entry = get_pin_table_entry(signal, bank_table)
     entry['index'] = 0
@@ -60,6 +61,7 @@ def flatten_scalar_pins(signal: dict[str, Any], bank_table: dict[int, dict[str, 
 
 def flatten_array_pins(signal: dict[str, Any], bank_table: dict[int, dict[str, Any]]) -> list[dict[str, Any]]:
     """Flattens a signal into a list of pins"""
+    assert 'pins' in signal, f"Signal '{signal['name']}' is not an array of pins"
 
     pin_table_entries = []
     for index, pin in enumerate(signal['pins']):
@@ -103,11 +105,43 @@ def flatten_array_pinset(signal: dict[str, Any], bank_table: dict[int, dict[str,
 
 def flatten_multibank_pins(signal: dict[str, Any], bank_table: dict[int, dict[str, Any]]) -> list[dict[str, Any]]:
     assert 'multibank' in signal, f"Signal '{signal['name']}' is not a multibank signal"
+    assert not signal['diff_pair'], f"Signal '{signal['name']}' is not a differential signal"
+
+    pin_table_entries = []
+
+    for fragment in signal['multibank']:
+        # Multibanks don't necessarily have to be sequential in how they
+        # appear in the multibank entry, so we pluck the offset that this bank lives at
+        # and then make pin entries off of that
+        offset = fragment['offset']
+
+        for index, pin in enumerate(fragment['pins'], offset):
+            entry = get_pin_table_entry(signal, bank_table)
+            entry['pin'] = pin
+            entry['index'] = index
+            pin_table_entries.append(entry)
+
+    return pin_table_entries
 
 def flatten_multibank_pinset(signal: dict[str, Any], bank_table: dict[int, dict[str, Any]]) -> list[dict[str, Any]]:
     assert 'multibank' in signal, f"Signal '{signal['name']}' is not a multibank signal"
+    assert signal['diff_pair'], f"Signal '{signal['name']}' is not a differential signal"
 
-def get_pin_table_entry(signal: dict[str, Any], bank_table dict[int, dict[str, Any]]) -> dict[str, Any]:
+    pin_table_entries = []
+
+    for fragment in signal['multibank']:
+        entry = get_pin_table_entry(signal, bank_table)
+        offset = fragment['offset']
+        pinset = fragment['pinset']
+        for index, (p_pin, n_pin) in enumerate(zip(pinset['p'], pinset['n']), offset):
+            entry['p'] = p_pin
+            entry['n'] = n_pin
+            entry['index'] = index
+            pin_table_entries.append(entry)
+
+    return pin_table_entries
+
+def get_pin_table_entry(signal: dict[str, Any], bank_table: dict[int, dict[str, Any]]) -> dict[str, Any]:
     """Returns a minimal pin table entry with name, direction, buffer, and iostandard
 
     Args:
