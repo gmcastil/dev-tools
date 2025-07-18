@@ -1,6 +1,0 @@
-{
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "description": "A single package pin identifier (alphanumeric string like 'A1')",
-    "type": "string",
-    "additionalProperties": false
-}
