@@ -257,6 +257,9 @@ def validate_required_fields(signal: dict[str, Any]) -> None:
 def validate_required_multibank_fields(signal: dict[str, Any]) -> None:
     """Validate that required fields for multibank signals are present"""
     name = signal["name"]
+    assert (
+        "multibank" in signal
+    ), f"Signal '{name}' does not contain a 'multibank' element"
 
     # Make sure they didn't pass us an empty list
     multibank = signal["multibank"]
@@ -287,6 +290,9 @@ def validate_iostandard_bank_no_multibank(signal: dict[str, Any]) -> None:
 
     """
     name = signal["name"]
+    assert (
+        "multibank" in signal
+    ), f"Signal '{name}' does not contain a 'multibank' element"
 
     if "iostandard" in signal and "bank" in signal:
         msg = (
@@ -306,3 +312,21 @@ def validate_iostandard_bank_yes_multibank(signal: dict[str, Any]) -> None:
     other signals, so we validate them here differently.
 
     """
+    name = signal["name"]
+    assert (
+        "multibank" in signal
+    ), f"Signal '{name}' does not contain a 'multibank' element"
+
+    multibank = signal["multibank"]
+    if not multibank:
+        msg = f"Signal '{name}' cannot define an empty multibank section"
+        raise ValueError(msg)
+
+    # Multibank can inherit iostandard from the top level, in which case there
+    # can be no iostandard in the fragments. If we do not inherit from the top level, then
+    # we will either explicitly define the iostandard per bank, or inherit from the bank
+    # number (recall that bank is a required key per the schema).
+    if "iostandard" in signal:
+        if any("iostandard" in fragment for fragment in multibank):
+            msg = f"Signal '{name}' tries to override multibank 'iostandard'"
+            raise ValueError(msg)

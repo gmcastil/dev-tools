@@ -76,7 +76,42 @@ cases = [
         "valid": False,
     },
     {
-        "id": "mismatched_pinset_lengths",
+        "id": "missing_bank_in_fragment",
+        "signal": {
+            "name": "diff_data",
+            "multibank": [
+                {"pinset": {"p": ["D1", "D2"], "n": ["E1"]}, "offset": 0},
+                {"bank": 34, "pinset": {"p": ["D3", "D4"], "n": ["E3"]}, "offset": 2},
+            ],
+            "diff_pair": True,
+            "bus": True,
+            "direction": "in",
+            "buffer": "ibuf",
+            "width": 4,
+        },
+        "validator": validate_multibank_pinset,
+        "valid": False,
+    },
+    {
+        "id": "top_level_bank_illegal",
+        "signal": {
+            "name": "diff_data",
+            "bank": 34,
+            "multibank": [
+                {"bank": 34, "pinset": {"p": ["D1", "D2"], "n": ["E1"]}, "offset": 0},
+                {"bank": 35, "pinset": {"p": ["D3", "D4"], "n": ["E3"]}, "offset": 2},
+            ],
+            "diff_pair": True,
+            "bus": True,
+            "direction": "in",
+            "buffer": "ibuf",
+            "width": 4,
+        },
+        "validator": validate_multibank_pinset,
+        "valid": False,
+    },
+    {
+        "id": "formerly_mismatched_pinset_lengths",
         "signal": {
             "name": "diff_data",
             "multibank": [
@@ -91,6 +126,51 @@ cases = [
         },
         "validator": validate_multibank_pinset,
         "valid": True,
+    },
+    {
+        "id": "top_level_iostandard_ok",
+        "signal": {
+            "name": "diff_data",
+            "iostandard": "LVCMOS33",
+            "multibank": [
+                {"bank": 34, "pinset": {"p": ["D1", "D2"], "n": ["E1"]}, "offset": 0},
+                {"bank": 35, "pinset": {"p": ["D3", "D4"], "n": ["E3"]}, "offset": 2},
+            ],
+            "diff_pair": True,
+            "bus": True,
+            "direction": "in",
+            "buffer": "ibuf",
+            "width": 4,
+        },
+        "validator": validate_multibank_pinset,
+        "valid": True,
+    },
+    {
+        "id": "top_level_iostandard_but_bank_tries_override",
+        "signal": {
+            "name": "diff_data",
+            "iostandard": "LVCMOS33",
+            "multibank": [
+                {
+                    "iostandard": "LVCMOS33",
+                    "bank": 34,
+                    "pinset": {"p": ["D1", "D2"], "n": ["E1"]},
+                    "offset": 0,
+                },
+                {
+                    "bank": 35,
+                    "pinset": {"p": ["D3", "D4"], "n": ["E3"]},
+                    "offset": 2,
+                },
+            ],
+            "diff_pair": True,
+            "bus": True,
+            "direction": "in",
+            "buffer": "ibuf",
+            "width": 4,
+        },
+        "validator": validate_multibank_pinset,
+        "valid": False,
     },
 ]
 
