@@ -1,12 +1,12 @@
 from typing import Any
 
-from utils import is_scalar_pins, is_array_pins
-from utils import is_scalar_pinset, is_array_pinset
-from utils import is_multibank_pins, is_multibank_pinset
+from io_gen.utils import is_scalar_pins, is_array_pins
+from io_gen.utils import is_scalar_pinset, is_array_pinset
+from io_gen.utils import is_multibank_pins, is_multibank_pinset
+
 
 def extract_pin_table(
-    signal_table: dict[str, dict[str, Any]],
-    bank_table: dict[int, dict[str, Any]]
+    signal_table: list[dict[str, Any]], bank_table: dict[int, dict[str, Any]]
 ) -> list[dict[str, Any]]:
     """Flatten signals into atomic pin entries
 
@@ -14,7 +14,7 @@ def extract_pin_table(
     pins or differential pairs.
 
     Args:
-        signal_table: The extracted per-signal metadata table, with keys as signal names
+        signal_table: The extracted per-signal metadata table
         bank_table: The extracted per-bank metadata table, with keys as bank numbers
 
     Returns:
@@ -23,8 +23,7 @@ def extract_pin_table(
     """
     pin_table = []
 
-    for sig_name in signal_table:
-        signal = signal_table[sig_name]
+    for signal in signal_table:
 
         if is_scalar_pins(signal):
             pin_entries = flatten_scalar_pins(signal, bank_table)
@@ -46,102 +45,129 @@ def extract_pin_table(
 
     return pin_table
 
-def flatten_scalar_pins(signal: dict[str, Any], bank_table: dict[int, dict[str, Any]]) -> list[dict[str, Any]]:
+
+def flatten_scalar_pins(
+    signal: dict[str, Any], bank_table: dict[int, dict[str, Any]]
+) -> list[dict[str, Any]]:
     """Flattens a signal into a list of pins"""
-    assert 'pins' in signal, f"Signal '{signal['name']}' is not a single-ended signal"
+    assert "pins" in signal, f"Signal '{signal['name']}' is not a single-ended signal"
 
     entry = get_pin_table_entry(signal, bank_table)
-    entry['index'] = 0
-    entry['pin'] = signal['pins']
+    entry["index"] = 0
+    entry["pin"] = signal["pins"]
     pin_table_entries = [entry]
 
     check_flattened_width(signal, pin_table_entries)
 
     return pin_table_entries
 
-def flatten_array_pins(signal: dict[str, Any], bank_table: dict[int, dict[str, Any]]) -> list[dict[str, Any]]:
+
+def flatten_array_pins(
+    signal: dict[str, Any], bank_table: dict[int, dict[str, Any]]
+) -> list[dict[str, Any]]:
     """Flattens a signal into a list of pins"""
-    assert 'pins' in signal, f"Signal '{signal['name']}' is not an array of pins"
+    assert "pins" in signal, f"Signal '{signal['name']}' is not an array of pins"
 
     pin_table_entries = []
-    for index, pin in enumerate(signal['pins']):
+    for index, pin in enumerate(signal["pins"]):
         entry = get_pin_table_entry(signal, bank_table)
-        entry['index'] = index
-        entry['pin'] = pin
+        entry["index"] = index
+        entry["pin"] = pin
         pin_table_entries.append(entry)
     check_flattened_width(signal, pin_table_entries)
 
     return pin_table_entries
 
-def flatten_scalar_pinset(signal: dict[str, Any], bank_table: dict[int, dict[str, Any]]) -> list[dict[str, Any]]:
+
+def flatten_scalar_pinset(
+    signal: dict[str, Any], bank_table: dict[int, dict[str, Any]]
+) -> list[dict[str, Any]]:
     """Flattens a signal into a list of pin pairs"""
-    assert signal['diff_pair'], f"Signal '{signal['name']}' is not a differential pair"
+    assert signal["diff_pair"], f"Signal '{signal['name']}' is not a differential pair"
 
     entry = get_pin_table_entry(signal, bank_table)
-    entry['index'] = 0
-    entry['p'] = signal['p']
-    entry['n'] = signal['n']
+    entry["index"] = 0
+    entry["p"] = signal["pinset"]["p"]
+    entry["n"] = signal["pinset"]["n"]
     pin_table_entries = [entry]
 
     check_flattened_width(signal, pin_table_entries)
 
     return pin_table_entries
 
-def flatten_array_pinset(signal: dict[str, Any], bank_table: dict[int, dict[str, Any]]) -> list[dict[str, Any]]:
+
+def flatten_array_pinset(
+    signal: dict[str, Any], bank_table: dict[int, dict[str, Any]]
+) -> list[dict[str, Any]]:
     """Flattens a signal into a list of pin pairs"""
-    assert signal['diff_pair'], f"Signal '{signal['name']}' is not a differential pair"
+    assert signal["diff_pair"], f"Signal '{signal['name']}' is not a differential pair"
 
     pin_table_entries = []
-    for index, (pin_p, pin_n) in enumerate(zip(signal["pinset"]["p"], signal["pinset"]["n"])):
+    for index, (pin_p, pin_n) in enumerate(
+        zip(signal["pinset"]["p"], signal["pinset"]["n"])
+    ):
         entry = get_pin_table_entry(signal, bank_table)
-        entry['index'] = index
-        entry['p'] = pin_p
-        entry['n'] = pin_n
+        entry["index"] = index
+        entry["p"] = pin_p
+        entry["n"] = pin_n
         pin_table_entries.append(entry)
 
     check_flattened_width(signal, pin_table_entries)
 
     return pin_table_entries
 
-def flatten_multibank_pins(signal: dict[str, Any], bank_table: dict[int, dict[str, Any]]) -> list[dict[str, Any]]:
-    assert 'multibank' in signal, f"Signal '{signal['name']}' is not a multibank signal"
-    assert not signal['diff_pair'], f"Signal '{signal['name']}' is not a differential signal"
+
+def flatten_multibank_pins(
+    signal: dict[str, Any], bank_table: dict[int, dict[str, Any]]
+) -> list[dict[str, Any]]:
+    assert "multibank" in signal, f"Signal '{signal['name']}' is not a multibank signal"
+    assert not signal[
+        "diff_pair"
+    ], f"Signal '{signal['name']}' is not a differential signal"
 
     pin_table_entries = []
 
-    for fragment in signal['multibank']:
+    for fragment in signal["multibank"]:
         # Multibanks don't necessarily have to be sequential in how they
         # appear in the multibank entry, so we pluck the offset that this bank lives at
         # and then make pin entries off of that
-        offset = fragment['offset']
+        offset = fragment["offset"]
 
-        for index, pin in enumerate(fragment['pins'], offset):
+        for index, pin in enumerate(fragment["pins"], offset):
             entry = get_pin_table_entry(signal, bank_table)
-            entry['pin'] = pin
-            entry['index'] = index
+            entry["pin"] = pin
+            entry["index"] = index
             pin_table_entries.append(entry)
 
     return pin_table_entries
 
-def flatten_multibank_pinset(signal: dict[str, Any], bank_table: dict[int, dict[str, Any]]) -> list[dict[str, Any]]:
-    assert 'multibank' in signal, f"Signal '{signal['name']}' is not a multibank signal"
-    assert signal['diff_pair'], f"Signal '{signal['name']}' is not a differential signal"
+
+def flatten_multibank_pinset(
+    signal: dict[str, Any], bank_table: dict[int, dict[str, Any]]
+) -> list[dict[str, Any]]:
+    assert "multibank" in signal, f"Signal '{signal['name']}' is not a multibank signal"
+    assert signal[
+        "diff_pair"
+    ], f"Signal '{signal['name']}' is not a differential signal"
 
     pin_table_entries = []
 
-    for fragment in signal['multibank']:
+    for fragment in signal["multibank"]:
         entry = get_pin_table_entry(signal, bank_table)
-        offset = fragment['offset']
-        pinset = fragment['pinset']
-        for index, (p_pin, n_pin) in enumerate(zip(pinset['p'], pinset['n']), offset):
-            entry['p'] = p_pin
-            entry['n'] = n_pin
-            entry['index'] = index
+        offset = fragment["offset"]
+        pinset = fragment["pinset"]
+        for index, (p_pin, n_pin) in enumerate(zip(pinset["p"], pinset["n"]), offset):
+            entry["p"] = p_pin
+            entry["n"] = n_pin
+            entry["index"] = index
             pin_table_entries.append(entry)
 
     return pin_table_entries
 
-def get_pin_table_entry(signal: dict[str, Any], bank_table: dict[int, dict[str, Any]]) -> dict[str, Any]:
+
+def get_pin_table_entry(
+    signal: dict[str, Any], bank_table: dict[int, dict[str, Any]]
+) -> dict[str, Any]:
     """Returns a minimal pin table entry with name, direction, buffer, and iostandard
 
     Args:
@@ -154,43 +180,55 @@ def get_pin_table_entry(signal: dict[str, Any], bank_table: dict[int, dict[str, 
     """
     # Every entry in the pin table will get these values directly fro the signal its a part of
     entry = {
-        'name' : signal['name'],
-        'direction' : signal['direction'],
-        'buffer' : signal['buffer'],
-        'diff_pair' : signal['diff_pair'],
-        'bus' : signal['bus']
+        "name": signal["name"],
+        "direction": signal["direction"],
+        "buffer": signal["buffer"],
+        "diff_pair": signal["diff_pair"],
+        "bus": signal["bus"],
     }
 
     # The iostandard is a bit more sophisticated, so resolve that separately
-    entry['iostandard'] = resolve_iostandard(signal, bank_table)
+    entry["iostandard"] = resolve_iostandard(signal, bank_table)
 
     return entry
 
-def resolve_iostandard(signal: dict[str, Any], bank_table: dict[int, dict[str, Any]]) -> str:
+
+def resolve_iostandard(
+    signal: dict[str, Any], bank_table: dict[int, dict[str, Any]]
+) -> str:
     """Resolves the iostandard for a signal via inheritance or direct specification"""
 
     # The iostandard is specified directly (but checked if a bank was supplied)
-    if 'iostandard' in signal:
-        sig_iostandard = signal['iostandard']
+    if "iostandard" in signal:
+        sig_iostandard = signal["iostandard"]
 
-        if 'bank' in signal:
-            bank_iostandard = get_bank_iostandard(signal['bank'], bank_table)
+        if "bank" in signal:
+            bank_iostandard = get_bank_iostandard(signal["bank"], bank_table)
             if bank_iostandard != sig_iostandard:
                 msg = (
                     f"Signal '{signal['name']}' specifies IOSTANDARD '{sig_iostandard}' but bank {signal['bank']} declares "
                     f"'{bank_iostandard}' — values must match. Either remove the signal-level IOSTANDARD to "
                     f"inherit from the bank, or update one to resolve the conflict."
-                    )
+                )
                 raise ValueError(msg)
     # The iostandard is inherited
-    elif 'bank' in signal:
-        sig_iostandard = get_bank_iostandard(signal['bank'], bank_table)
+    elif "bank" in signal:
+        sig_iostandard = get_bank_iostandard(signal["bank"], bank_table)
     # Cannot resolve the iostandard
+    # This shoudl go in a readme
+    # For multibank signals, each fragment must either:
+
+    # Specify bank, and inherit iostandard from bank_table[bank], or
+
+    # Specify iostandard explicitly
+
+    # There is no top-level iostandard on the signal itself.
     else:
         msg = f"Signal '{signal['name']}' does not contain an 'iostandard' or 'bank' property"
         raise ValueError(msg)
 
     return sig_iostandard
+
 
 def get_bank_iostandard(number: int, bank_table: dict[int, dict[str, Any]]) -> str:
     """Looks up the IOSTANDARD property for a bank from the bank table"""
@@ -200,22 +238,25 @@ def get_bank_iostandard(number: int, bank_table: dict[int, dict[str, Any]]) -> s
         raise ValueError(msg)
 
     # The bank 'iostandard' key is required by the schema
-    assert 'iostandard' in bank_table[number], "Bank 'iostandard' is missing from bank table entry"
+    assert (
+        "iostandard" in bank_table[number]
+    ), "Bank 'iostandard' is missing from bank table entry"
 
-    iostandard = bank_table[number]['iostandard']
+    iostandard = bank_table[number]["iostandard"]
     return iostandard
 
-def check_flattened_width(signal: dict[str, Any], pin_entries: list[dict[str, Any]]) -> None:
+
+def check_flattened_width(
+    signal: dict[str, Any], pin_entries: list[dict[str, Any]]
+) -> None:
     """Checks that flattened pin entries have the appropriate width and range"""
 
-    actual_indices = sorted(entry['index'] for entry in pin_entries)
-    expected_indices = list(range(0, signal['width']))
+    actual_indices = sorted(entry["index"] for entry in pin_entries)
+    expected_indices = list(range(0, signal["width"]))
 
     if actual_indices != expected_indices:
         msg = (
-                f"Signal '{signal['name']}' has index or width mismatch: "
-                f"expected {expected_indices}, but got {actual_indices}"
-                )
+            f"Signal '{signal['name']}' has index or width mismatch: "
+            f"expected {expected_indices}, but got {actual_indices}"
+        )
         raise ValueError(msg)
-    
-

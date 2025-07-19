@@ -1,5 +1,6 @@
 import pytest
 import yaml
+
 from io_gen.signal_table import form_signal_entry
 
 test_cases = [
@@ -14,6 +15,7 @@ signals:
     bank: 34
 """,
         "expected": {
+            "name": "led",
             "pins": "A1",
             "direction": "out",
             "buffer": "infer",
@@ -36,6 +38,7 @@ signals:
     width: 3
 """,
         "expected": {
+            "name": "data",
             "pins": ["A1", "A2", "A3"],
             "direction": "in",
             "buffer": "ibuf",
@@ -59,6 +62,7 @@ signals:
     iostandard: LVCMOS33
 """,
         "expected": {
+            "name": "clk",
             "pinset": {"p": "C1", "n": "C2"},
             "direction": "in",
             "buffer": "ibuf",
@@ -84,6 +88,7 @@ signals:
     width: 2
 """,
         "expected": {
+            "name": "diff_bus",
             "pinset": {"p": ["C1", "C3"], "n": ["C2", "C4"]},
             "direction": "out",
             "buffer": "obuf",
@@ -112,6 +117,7 @@ signals:
     width: 4
 """,
         "expected": {
+            "name": "ctrl",
             "multibank": [
                 {"pins": ["A1", "A2"], "bank": 34, "offset": 0},
                 {"pins": ["B1", "B2"], "bank": 35, "offset": 2},
@@ -146,8 +152,13 @@ signals:
     width: 3
 """,
         "expected": {
+            "name": "clk_diff",
             "multibank": [
-                {"pinset": {"p": ["C1", "C3"], "n": ["C2", "C4"]}, "bank": 34, "offset": 0},
+                {
+                    "pinset": {"p": ["C1", "C3"], "n": ["C2", "C4"]},
+                    "bank": 34,
+                    "offset": 0,
+                },
                 {"pinset": {"p": ["D1"], "n": ["D2"]}, "bank": 35, "offset": 2},
             ],
             "direction": "in",
@@ -160,6 +171,7 @@ signals:
         },
     },
 ]
+
 
 @pytest.mark.parametrize("case", test_cases, ids=[c["id"] for c in test_cases])
 def test_form_signal_entry(case):

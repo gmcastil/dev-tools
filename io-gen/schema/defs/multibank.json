@@ -8,6 +8,7 @@
             "bank": { "$ref": "bank.json" },
             "pins": { "$ref": "pins.json" },
             "pinset": { "$ref": "pinset.json" },
+            "iostandard": { "$ref": "iostandard.json" },
             "offset": {
                 "type": "integer",
                 "minimum": 0

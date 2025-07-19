@@ -1,5 +1,6 @@
-{
-  "sig_inherit": {
+[
+    {
+    "name": "sig_inherit",
     "direction": "in",
     "buffer": "ibuf",
     "group": "",
@@ -9,8 +10,9 @@
     "bus": false,
     "bank": 34,
     "width": 1
-  },
-  "sig_override": {
+    },
+    {
+    "name": "sig_override",
     "direction": "out",
     "buffer": "obuf",
     "group": "",
@@ -21,7 +23,8 @@
     "bus": false,
     "width": 1
   },
-  "bus_34_inherit": {
+  {
+    "name": "bus_34_inherit",
     "direction": "in",
     "buffer": "ibuf",
     "group": "",
@@ -32,7 +35,8 @@
     "bank": 34,
     "width": 3
   },
-  "bus_35_override": {
+  {
+    "name": "bus_35_override",
     "direction": "out",
     "buffer": "obuf",
     "group": "",
@@ -43,8 +47,8 @@
     "bus": true,
     "width": 3
   },
-
-  "d_inherit_34": {
+  {
+    "name": "d_inherit_34",
     "direction": "in",
     "buffer": "ibufds",
     "group": "",
@@ -58,7 +62,8 @@
     "bank": 34,
     "width": 1
   },
-  "d_override_34": {
+  {
+    "name": "d_override_34",
     "direction": "out",
     "buffer": "obufds",
     "group": "",
@@ -72,7 +77,8 @@
     "bus": false,
     "width": 1
   },
-  "d_inherit_35": {
+  {
+    "name": "d_inherit_35",
     "direction": "in",
     "buffer": "ibufds",
     "group": "",
@@ -86,7 +92,8 @@
     "bank": 35,
     "width": 1
   },
-  "d_override_35": {
+  {
+    "name": "d_override_35",
     "direction": "out",
     "buffer": "obufds",
     "group": "",
@@ -100,7 +107,8 @@
     "bus": false,
     "width": 1
   },
-  "d_array_34": {
+  {
+    "name": "d_array_34",
     "direction": "in",
     "buffer": "ibufds",
     "group": "",
@@ -114,7 +122,8 @@
     "bus": true,
     "width": 3
   },
-  "d_array_override": {
+  {
+    "name": "d_array_override",
     "direction": "in",
     "buffer": "ibufds",
     "group": "",
@@ -128,7 +137,8 @@
     "bus": true,
     "width": 3
   },
-  "mb_override": {
+  {
+    "name": "mb_override",
     "direction": "out",
     "buffer": "obuf",
     "group": "",
@@ -150,7 +160,8 @@
     "bus": true,
     "width": 4
   },
-  "mb_inherit_d": {
+  {
+    "name": "mb_inherit_d",
     "direction": "in",
     "buffer": "ibufds",
     "group": "",
@@ -177,7 +188,8 @@
     "bus": true,
     "width": 4
   },
-  "mb_edge_1": {
+  {
+    "name": "mb_edge_1",
     "direction": "in",
     "buffer": "ibufds",
     "group": "",
@@ -205,8 +217,8 @@
     "bus": true,
     "width": 4
   },
-
-  "mb_edge_2": {
+  {
+    "name": "mb_edge_2",
     "direction": "out",
     "buffer": "obufds",
     "group": "",
@@ -234,4 +246,4 @@
     "bus": true,
     "width": 4
   }
-}
+]
