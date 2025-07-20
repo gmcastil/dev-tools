@@ -36,7 +36,7 @@ CASES = [
     },
     # Multiple fragments, each with one pin
     {
-        "id": "multiple-fragments-mixed-banks",
+        "id": "multiple-fragments-mixed-banks-out-of-order",
         "signal": {
             "name": "sw",
             "direction": "in",
@@ -153,7 +153,7 @@ CASES = [
                 "pin": "D2",
                 "buffer": "ibuf",
                 "bus": True,
-                "iostandard": "LVCMOS33",
+                "iostandard": "LVCMOS12",
                 "diff_pair": False,
                 "index": 1,
             },
@@ -166,4 +166,4 @@ CASES = [
 @pytest.mark.parametrize("case", CASES, ids=[c["id"] for c in CASES])
 def test_flatten_multibank_pins(case):
     result = case["func"](case["signal"], BANKS)
-    assert result == case["expected"]
+    assert result == sorted(case["expected"], key=lambda x: x["index"])

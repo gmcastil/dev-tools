@@ -40,7 +40,7 @@ test: $(VENV_INSTALLED_STAMP)
 	@$(PYTHON) -m pytest -k $(TESTS) $(TEST_ARGS)
 
 debug: $(VENV_INSTALLED_STAMP)
-	$(PYTHON) -m pytest -k $(TESTS) -s --pdb
+	$(PYTHON) -m pytest -k $(TESTS) -vv -s --pdb
 
 coverage: $(VENV_INSTALLED_STAMP)
 	@$(PYTHON) -m pytest $(COVERAGE_ARGS)

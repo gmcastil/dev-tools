@@ -280,7 +280,7 @@ def validate_required_multibank_fields(signal: dict[str, Any]) -> None:
 
 
 def validate_iostandard_bank_no_multibank(signal: dict[str, Any]) -> None:
-    """Validate that iostandard or banks are present
+    """Validate that iostandard or banks are present (for non multibank signals)
 
     Pin and pinset arrays and scalars inherit their iostandard properties
     in the same way, so we validate them the same (either, or both with a note
@@ -290,9 +290,7 @@ def validate_iostandard_bank_no_multibank(signal: dict[str, Any]) -> None:
 
     """
     name = signal["name"]
-    assert (
-        "multibank" in signal
-    ), f"Signal '{name}' does not contain a 'multibank' element"
+    assert "multibank" not in signal, f"Signal '{name}' contains a 'multibank' element"
 
     if "iostandard" in signal and "bank" in signal:
         msg = (
