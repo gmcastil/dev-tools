@@ -37,7 +37,6 @@ def extract_signal_table(signals: list[dict[str, Any]]) -> list[dict[str, Any]]:
     sig_names = set()
 
     for sig in signals:
-
         # Skip omitted signals
         if not sig.get("generate", True):
             continue
@@ -119,3 +118,8 @@ def form_signal_entry(signal: dict[str, Any]) -> dict[str, Any]:
     entry["width"] = get_sig_width(signal)
 
     return entry
+
+
+def get_signal_names(signal_table: list[dict[str, Any]]) -> list[str]:
+    """Returns a list of signal names from the signal table"""
+    return list(set(sig["name"] for sig in signal_table))

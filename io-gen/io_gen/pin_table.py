@@ -57,3 +57,16 @@ def extract_pin_table(
         pin_table.extend(pin_entries)
 
     return pin_table
+
+
+def get_pins_by_signal(
+    name: str, pin_table: list[dict[str, Any]]
+) -> list[dict[str, Any]]:
+    """Groups and returns flattened pins from the pin table sorted by index"""
+
+    pins = [entry for entry in pin_table if entry["signal"] == name]
+    if not pins:
+        msg = f"No pins found for signal '{name}'"
+        raise ValueError(msg)
+
+    return sorted(pins, key=lambda entry: entry["index"])

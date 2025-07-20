@@ -1,92 +1,116 @@
-from io_gen.utils import is_single_ended_signal
-
 from typing import Any
 
-def emit_signal_xdc(signal: dict[str, Any], pins: list[dict[str, Any]]) -> list[str]:
-    """Emit XDC constraints for a single logical signal.
+from io_gen.pin_table import get_pins_by_signal
 
-    This function generates all `set_property` lines for one signal,
-    based on its definition and corresponding flattened pin entries.
 
-    Args:
-        signal: The original signal definition from the signal table.
-        pins: A list of flattened pin entries associated with this signal.
+def emit_xdc(
+    signal_table: list[dict[str, Any]], pin_table: list[dict[str, Any]]
+) -> list[str]:
+    """Constructs XDC constraints from signal table and flattend pin table"""
 
-    Returns:
-        A string containing XDC lines for this signal, separated by newlines.
+    output_xdc = []
 
-    """
-    is_single_ended = is_single_ended_signal(pins)
+    # Iterate over the signal table by signal name
+    for signal in signal_table:
+        sig_name = signal["name"]
+        pins = get_pins_by_signal(sig_name, pin_table)
 
-    # Sanity check here in case of improper filtering upstream
-    assert all(pin['name'] == pins[0]['name'] for pin in pins)
+        # Start the signal with the XDC comment
+        xdc_comment = get_xdc_comment(signal)
+        if xdc_comment:
+            output_xdc.append(xdc_comment)
 
-    # Initialize the XDC block that is going to come from this signal with
-    # whatever comments were supplied
-    # TODO: This needs to wait until the schema is updated to include an XDC and HDL comment
-    xdc_lines = []
-
-    # Not all single bit signals actually get emitted that way - some are treated as
-    # single bit buses for emission purposes
-    if emit_as_single_bit_signal(signal, pins):
-        pin = pins[0]
-        name = pin['name']
-        iostandard = pin['iostandard']
-
-        if is_single_ended:
-            port_name = f"{name}_pad"
-            port = pin['pin']
-            xdc_lines.extend(emit_single_ended_xdc(port_name, port, iostandard))
+        if signal["diff_pair"]:
+            output_xdc.extend(emit_xdc_diff(pins))
         else:
-            p_name = f"{name}_p"
-            n_name = f"{name}_n"
-            p_port = pin['p']
-            n_port = pin['n']
-            xdc_lines.extend(emit_diff_pair_xdc(p_name, n_name, p_port, n_port, iostandard))
+            output_xdc.extend(emit_xdc_single(pins))
 
-    else:
-        xdc_lines = []
-        for pin in pins:
-            name = pin['name']
+        # Finish the signal text with an empty line
+        output_xdc.append("")
 
-            # Recall that IOSTANDARD can vary across a signal if the signal is split
-            # across multiple banks
-            iostandard = pin['iostandard']
+    return output_xdc
 
-            if is_single_ended:
-                port_name = f"{name}_pad"
-                port = pin['pin']
-                xdc_lines.extend(emit_single_ended_xdc(port_name, port, iostandard))
-            else:
-                p_name = f"{name}_p"
-                n_name = f"{name}_n"
-                p_port = pin['p']
-                n_port = pin['n']
-                xdc_lines.extend(emit_diff_pair_xdc(p_name, n_name, p_port, n_port, iostandard))
+
+def emit_xdc_single(pins: list[dict[str, Any]]) -> list[str]:
+    """Returns a list of pin constraints for singled ended signals"""
+    xdc_lines = []
+    for pin in sorted(pins, key=lambda entry: entry["index"]):
+        # set_property PACKAGE_PIN A1 [get_ports {steak_sauce_pad}]
+        port_name = get_xdc_single_port_name(pin)
+        pkg_pin_str = (
+            f"set_property PACKAGE_PIN {pin['pin']} [get_ports {{{port_name}}}]"
+        )
+        xdc_lines.append(pkg_pin_str)
+
+        # set_property IOSTANDARD LVCMOS33 [get_ports {steak_sauce_pad}]
+        iostandard = get_xdc_iostandard(pin)
+        iostandard_str = (
+            f"set_property IOSTANDARD {iostandard} [get_ports {{{port_name}}}]"
+        )
+        xdc_lines.append(iostandard_str)
 
     return xdc_lines
 
-def emit_single_ended_xdc(name: str, port: str, iostandard: str) -> list[str]:
-    return [
-            f"set_property PACKAGE_PIN {port} [get_ports {{{name}}}]",
-            f"set_property IOSTANDARD {iostandard} [get_ports {{{name}}}]"
-            ]
 
-def emit_diff_pair_xdc(p_name: str, n_name: str, p_pin: str, n_pin: str, iostandard: str) -> list[str]:
-    return [
-            f"set_property PACKAGE_PIN {p_pin} [get_ports {{{p_name}}}]",
-            f"set_property IOSTANDARD {iostandard} [get_ports {{{p_name}}}]",
-            f"set_property PACKAGE_PIN {n_pin} [get_ports {{{n_name}}}]",
-            f"set_property IOSTANDARD {iostandard} [get_ports {{{n_name}}}]"
-            ]
+def emit_xdc_diff(pins: list[dict[str, Any]]) -> list[str]:
+    """Returns a list of pin constraints for diff signals"""
+    xdc_lines = []
+    for pin in sorted(pins, key=lambda entry: entry["index"]):
+        # set_property PACKAGE_PINS A1 [get_port {steak_sauce_p}]
+        # set_property PACKAGE_PINS A2 [get_port {steak_sauce_n}]
+        port_p, port_n = get_xdc_port_names_diff(pin)
+        pkg_pin_p_str = f"set_property PACKAGE_PIN {pin['p']} [get_ports {{{port_p}}}]"
+        pkg_pin_n_str = f"set_property PACKAGE_PIN {pin['n']} [get_ports {{{port_n}}}]"
 
-def emit_as_single_bit_signal(signal: dict[str, Any], pins: list[dict[str, Any]]) -> bool:
-    """Determine if a signal should be emitted as single bit or a bus"""
+        # set_property IOSTANDARD LVCMOS33 [get_ports {steak_sauce_p}]
+        # set_property IOSTANDARD LVCMOS33 [get_ports {steak_sauce_n}]
+        iostandard = get_xdc_iostandard(pin)
+        iostandard_str_p = (
+            f"set_property IOSTANDARD {iostandard} [get_ports {{{port_p}}}]"
+        )
+        iostandard_str_n = (
+            f"set_property IOSTANDARD {iostandard} [get_ports {{{port_n}}}]"
+        )
 
-    if len(pins) > 1:
-        return False
-    elif len(pins) == 1 and signal['as_bus'] == True:
-        return False
+        xdc_lines.append(pkg_pin_p_str)
+        xdc_lines.append(iostandard_str_p)
+        xdc_lines.append(pkg_pin_n_str)
+        xdc_lines.append(iostandard_str_n)
+
+    return xdc_lines
+
+
+def get_xdc_comment(signal: dict[str, Any]) -> str | None:
+    """Return XDC comment string if present, else None."""
+    comment = signal.get("comment", {}).get("xdc")
+    return f"# {comment}" if comment else None
+
+
+# Port name formatting is handled by a dedicated helper function.
+# This cleanly encapsulates the logic for whether to emit `foo` or `foo[0]`,
+# based on the `bus` flag. It avoids cluttering the emitter with conditionals,
+# and handles degenerate 1-bit buses in a centralized, consistent way.
+
+
+def get_xdc_single_port_name(pin: dict[str, Any]) -> str:
+    """Return the port name for a single-ended pin"""
+    base = f"{pin['name']}_pad"
+    if pin["bus"]:
+        return f"{base}[{pin['index']}]"
     else:
-        return True
+        return f"{base}"
 
+
+def get_xdc_port_names_diff(pin: dict[str, Any]) -> tuple[str, str]:
+    """Return the port names for a differential pair"""
+    base_p = f"{pin['name']}_p"
+    base_n = f"{pin['name']}_n"
+    if pin["bus"]:
+        return f"{base_p}[{pin['index']}]", f"{base_n}[{pin['index']}]"
+    else:
+        return base_p, base_n
+
+
+def get_xdc_iostandard(pin: dict[str, Any]) -> str:
+    """Return the IOSTANDARD property for the pin or pin pair"""
+    return pin["iostandard"]
