@@ -1,5 +1,5 @@
-
 import pytest
+
 from io_gen import pin_table
 
 BANKS = {
@@ -15,9 +15,7 @@ CASES = [
             "name": "led",
             "direction": "out",
             "buffer": "obuf",
-            "multibank": [
-                {"pins": "A1", "bank": 34, "offset": 0}
-            ],
+            "multibank": [{"pins": "A1", "bank": 34, "offset": 0}],
             "width": 1,
             "bus": False,
             "diff_pair": False,
@@ -93,9 +91,7 @@ CASES = [
             "name": "gpio",
             "direction": "inout",
             "buffer": "iobuf",
-            "multibank": [
-                {"pins": ["C1", "C2"], "bank": 35, "offset": 0}
-            ],
+            "multibank": [{"pins": ["C1", "C2"], "bank": 35, "offset": 0}],
             "width": 2,
             "bus": True,
             "diff_pair": False,
@@ -165,6 +161,7 @@ CASES = [
         "func": pin_table.flatten_multibank_pins,
     },
 ]
+
 
 @pytest.mark.parametrize("case", CASES, ids=[c["id"] for c in CASES])
 def test_flatten_multibank_pins(case):
