@@ -1,5 +1,5 @@
 module ps_inspect #(
-    localparam integer PRESCALE     = 8
+    parameter integer PRESCALE     = 8
 )
 (
     // Fabric clocks from the PS to be scaled down
