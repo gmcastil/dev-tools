@@ -1,13 +1,13 @@
 """
 Validate input data before processing
 """
+
 import json
 from pathlib import Path
-from typing import List, Dict, Any
 
-from referencing import Registry, Resource
-from jsonschema.exceptions import ValidationError
 from jsonschema import Draft202012Validator
+from jsonschema.exceptions import ValidationError
+from referencing import Registry, Resource
 
 # Schema locations
 SCHEMA_DIR = Path(__file__).parent.parent / "schema"
@@ -18,25 +18,28 @@ with open(SCHEMA_PATH) as f:
     io_gen_base_schema = json.load(f)
 
 defs = {
-        "defs/iostandard.json": json.load((DEFS_DIR / "iostandard.json").open()),
-        "defs/buffer.json": json.load((DEFS_DIR / "buffer.json").open()),
-        "defs/direction.json": json.load((DEFS_DIR / "direction.json").open()),
-        "defs/group.json": json.load((DEFS_DIR / "group.json").open()),
-        "defs/bank.json": json.load((DEFS_DIR / "bank.json").open()),
-        "defs/performance.json": json.load((DEFS_DIR / "performance.json").open()),
-        "defs/pins.json": json.load((DEFS_DIR / "pins.json").open()),
-        "defs/pinset.json": json.load((DEFS_DIR / "pinset.json").open()),
-        "defs/multibank.json": json.load((DEFS_DIR / "multibank.json").open())
+    "defs/iostandard.json": json.load((DEFS_DIR / "iostandard.json").open()),
+    "defs/buffer.json": json.load((DEFS_DIR / "buffer.json").open()),
+    "defs/parameters.json": json.load((DEFS_DIR / "parameters.json").open()),
+    "defs/instance.json": json.load((DEFS_DIR / "instance.json").open()),
+    "defs/direction.json": json.load((DEFS_DIR / "direction.json").open()),
+    "defs/group.json": json.load((DEFS_DIR / "group.json").open()),
+    "defs/bank.json": json.load((DEFS_DIR / "bank.json").open()),
+    "defs/performance.json": json.load((DEFS_DIR / "performance.json").open()),
+    "defs/pins.json": json.load((DEFS_DIR / "pins.json").open()),
+    "defs/pinset.json": json.load((DEFS_DIR / "pinset.json").open()),
+    "defs/multibank.json": json.load((DEFS_DIR / "multibank.json").open()),
 }
 
 resources = {
-        "schema.json": Resource.from_contents(io_gen_base_schema),
-        **{key: Resource.from_contents(value) for key, value in defs.items()}
+    "schema.json": Resource.from_contents(io_gen_base_schema),
+    **{key: Resource.from_contents(value) for key, value in defs.items()},
 }
 
 registry = Registry().with_resources(resources.items())
 
 validator = Draft202012Validator(io_gen_base_schema, registry=registry)
+
 
 def validate(data: dict) -> None:
     """
@@ -51,7 +54,8 @@ def validate(data: dict) -> None:
     """
     validator.validate(data)
 
-def load_enum_values(schema_path: Path) -> List[str]:
+
+def load_enum_values(schema_path: Path) -> list[str]:
     """Load the list of enum values from a JSON schema fragment.
 
     Useful for getting the enumerated values like IOSTANDARD, buffer types, directions,
@@ -79,4 +83,3 @@ def load_enum_values(schema_path: Path) -> List[str]:
         raise ValueError(f"Invalid enum contents in {schema_path}: {values}")
 
     return values
-

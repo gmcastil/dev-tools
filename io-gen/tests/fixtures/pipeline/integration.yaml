@@ -139,6 +139,10 @@ signals:
   - name: mb_edge_2
     direction: out
     buffer: obufds
+    parameters:
+      DRIVE: 12
+      SLEW: FAST
+    instance: custom_instance_mb_edge_2_obufds
     width: 4
     iostandard: LVCMOS25
     multibank:

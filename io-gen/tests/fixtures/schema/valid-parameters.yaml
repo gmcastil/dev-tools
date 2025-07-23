@@ -1,0 +1,36 @@
+title: Arty-Z7 with Parameters
+part: xc7z020clg400-1
+banks:
+  34:
+    performance: HR
+    iostandard: LVCMOS33
+
+signals:
+  - name: led0
+    pins: H17
+    direction: out
+    buffer: obuf
+    iostandard: LVCMOS33
+    parameters:
+      DRIVE: 12
+      SLEW: "FAST"
+
+  - name: clk_out
+    pins: G15
+    direction: out
+    buffer: obuf
+    bank: 34
+    parameters:
+      DRIVE: 16
+      CUSTOM_MODE: "ULTRA_FAST"
+      IOSTANDARD: LVCMOS33
+
+  - name: rx_in
+    pins: H18
+    direction: in
+    buffer: ibuf
+    iostandard: LVCMOS33
+    parameters:
+      DIFF_TERM: true
+      IBUF_LOW_PWR: false
+

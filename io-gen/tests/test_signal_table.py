@@ -1,5 +1,6 @@
 import pytest
 import yaml
+
 from io_gen.signal_table import extract_signal_table
 
 test_cases = [
@@ -16,6 +17,8 @@ test_cases = [
                 "name": "led",
                 "direction": "out",
                 "buffer": "infer",
+                "parameters": {},
+                "instance": None,
                 "group": "",
                 "comment": {},
                 "pins": "A1",
@@ -32,12 +35,20 @@ test_cases = [
             pins: [A1, A2, A3]
             direction: in
             buffer: ibuf
+            parameters:
+              DRIVE: 12
+              SLEW: "FAST"
             width: 3""",
         "expected": [
             {
                 "name": "data",
                 "direction": "in",
                 "buffer": "ibuf",
+                "parameters": {
+                    "SLEW": "FAST",
+                    "DRIVE": 12,
+                },
+                "instance": None,
                 "group": "",
                 "comment": {},
                 "pins": ["A1", "A2", "A3"],
@@ -56,12 +67,15 @@ test_cases = [
               n: C2
             direction: in
             buffer: ibuf
+            instance: test_clk
             width: 1""",
         "expected": [
             {
                 "name": "clk",
                 "direction": "in",
                 "buffer": "ibuf",
+                "parameters": {},
+                "instance": "test_clk",
                 "group": "",
                 "comment": {},
                 "pinset": {"p": "C1", "n": "C2"},
@@ -79,6 +93,7 @@ test_cases = [
             direction: in
             buffer: ibuf
             group: control
+            instance: ext_rst
             comment:
               hdl: active-low reset
             width: 1""",
@@ -87,6 +102,8 @@ test_cases = [
                 "name": "rst",
                 "direction": "in",
                 "buffer": "ibuf",
+                "parameters": {},
+                "instance": "ext_rst",
                 "group": "control",
                 "comment": {"hdl": "active-low reset"},
                 "pins": "R1",
@@ -113,12 +130,20 @@ test_cases = [
           n: [D4, D5, D6]
     direction: in
     buffer: ibufds
+    parameters:
+      DRIVE: 12
+      SLEW: FAST
     width: 6""",
         "expected": [
             {
                 "name": "diffbus",
                 "direction": "in",
                 "buffer": "ibufds",
+                "parameters": {
+                    "DRIVE": 12,
+                    "SLEW": "FAST",
+                },
+                "instance": None,
                 "group": "",
                 "comment": {},
                 "multibank": [

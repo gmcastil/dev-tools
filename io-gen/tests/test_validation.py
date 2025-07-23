@@ -1,8 +1,10 @@
+from pathlib import Path
+
 import pytest
 import yaml
-from pathlib import Path
-from io_gen.validator import validate
 from jsonschema.exceptions import ValidationError
+
+from io_gen.validator import validate
 
 FIXTURE_DIR = Path("tests/fixtures/schema")
 
@@ -21,6 +23,7 @@ def load_yaml_file(path):
         ("valid-multibank.yaml", True),
         ("valid-pinset-scalar.yaml", True),
         ("valid-scalar-with-width.yaml", True),
+        ("valid-parameters.yaml", True),
         ("invalid-missing-direction.yaml", False),
         ("invalid-pinset-array-no-width.yaml", False),
         ("invalid-unknown-field.yaml", False),

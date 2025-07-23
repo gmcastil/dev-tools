@@ -67,6 +67,22 @@ def form_signal_entry(signal: dict[str, Any]) -> dict[str, Any]:
         "direction": signal["direction"],
         "buffer": signal["buffer"],
     }
+    name = signal["name"]
+
+    # Adding instance names and buffer parameters, but only if we are explicitly
+    # instantiating a buffer. If inferred, that's an error.
+    if signal["buffer"] == "infer":
+        if signal.get("parameters"):
+            msg = f"Signal '{name}' uses inferred buffer but includes parameters"
+            raise ValueError(msg)
+        if signal.get("instance"):
+            msg = f"Signal '{name}' uses inferred buffer but includes an instance name"
+            raise ValueError(msg)
+
+    # All signal types will get these keys, but for inferred types, we fallback to
+    # an empty dict or None (just like comments)
+    entry["parameters"] = signal.get("parameters", {})
+    entry["instance"] = signal.get("instance", None)
 
     # Comment and group for signals are optional
     entry["group"] = signal.get("group", "")
@@ -112,7 +128,7 @@ def form_signal_entry(signal: dict[str, Any]) -> dict[str, Any]:
         entry["diff_pair"] = True
         entry["bus"] = True
     else:
-        msg = f"Signal '{signal['name']}' has missing or malformed pin definition"
+        msg = f"Signal '{name}' has missing or malformed pin definition"
         raise ValueError(msg)
 
     entry["width"] = get_sig_width(signal)

@@ -19,6 +19,8 @@ signals:
             "pins": "A1",
             "direction": "out",
             "buffer": "infer",
+            "parameters": {},
+            "instance": None,
             "bank": 34,
             "group": "",
             "comment": {},
@@ -35,6 +37,9 @@ signals:
     pins: [A1, A2, A3]
     direction: in
     buffer: ibuf
+    parameters:
+      DRIVE: 12
+      SLEW: FAST
     width: 3
 """,
         "expected": {
@@ -42,6 +47,11 @@ signals:
             "pins": ["A1", "A2", "A3"],
             "direction": "in",
             "buffer": "ibuf",
+            "parameters": {
+                "DRIVE": 12,
+                "SLEW": "FAST",
+            },
+            "instance": None,
             "group": "",
             "comment": {},
             "width": 3,
@@ -66,6 +76,8 @@ signals:
             "pinset": {"p": "C1", "n": "C2"},
             "direction": "in",
             "buffer": "ibuf",
+            "parameters": {},
+            "instance": None,
             "iostandard": "LVCMOS33",
             "group": "",
             "comment": {},
@@ -92,6 +104,8 @@ signals:
             "pinset": {"p": ["C1", "C3"], "n": ["C2", "C4"]},
             "direction": "out",
             "buffer": "obuf",
+            "parameters": {},
+            "instance": None,
             "iostandard": "LVCMOS25",
             "group": "",
             "comment": {},
@@ -124,6 +138,8 @@ signals:
             ],
             "direction": "out",
             "buffer": "obuf",
+            "parameters": {},
+            "instance": None,
             "group": "",
             "comment": {},
             "width": 4,
@@ -163,6 +179,8 @@ signals:
             ],
             "direction": "in",
             "buffer": "ibuf",
+            "parameters": {},
+            "instance": None,
             "group": "",
             "comment": {},
             "width": 3,
